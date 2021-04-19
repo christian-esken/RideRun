@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Ride Run</string>
+    <string name="title_rides">Rides</string>
+    <string name="title_parks">Parks</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="location_short">Location</string>
+</resources>
