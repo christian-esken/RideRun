@@ -1,12 +1,13 @@
 package org.riderun.app.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Ride {
     private final String name;
     private final Park park;
     private final int rcdbId;
-    private volatile LocalDate count;
+    private volatile Count count;
     // description
     // image
     // location / how to find
@@ -16,11 +17,11 @@ public class Ride {
         this(name, park, rcdbId, null);
     }
 
-    public Ride(String name, Park park, int rcdbId, LocalDate countDate) {
+    public Ride(String name, Park park, int rcdbId, Count count) {
         this.name = name;
         this.park = park;
         this.rcdbId = rcdbId;
-        this.count = countDate;
+        this.count = count == null ? new Count() : count;
     }
 
     public String name() {
@@ -31,11 +32,15 @@ public class Ride {
         return rcdbId;
     }
 
+    /**
+     * Returns the count date (first ride). Only the date portion is returned (w/o time)
+     * @return The date of the first ride, null if not ridden yet
+     */
     public LocalDate getCountDate() {
-        return count;
+        return count.getCountDate();
     }
 
-    public void setCountDate(LocalDate count) {
-        this.count = count;
+    public void setCountDate(LocalDateTime countDateTime) {
+        count.setCountDate(countDateTime);
     }
 }

@@ -23,6 +23,22 @@ public class RidesViewModel extends ViewModel {
         data.setValue(rdata);
     }
 
+    /**
+     * Informs that fields in the park or rides has changed
+     */
+    public void notifyFieldModification() {
+        data.postValue(new RidesData(park, rides));
+    }
+
+    /**
+     * Informs that fields in the park or rides has changed
+     */
+    public void setNewPark(Park park) {
+        this.park = park;
+        data.postValue(new RidesData(park, rides));
+    }
+
+
     public LiveData<RidesData> ridesData() {
         return data;
     }

@@ -1,10 +1,12 @@
 package org.riderun.app.storage;
 
 import org.riderun.app.model.City;
+import org.riderun.app.model.Count;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +22,10 @@ public class MockedData {
         Park park = new Park("Phantasialand", 4872, city, 50.833333, 6.9);
         PARKS.add(park);
 
-        LocalDate ld2020 = LocalDate.of(2020,9, 16);
-        LocalDate ld2018 = LocalDate.of(2018,6, 5);
+        LocalDateTime ldx2020 = LocalDate.of(2020,9, 16).atStartOfDay();
+        LocalDateTime ldx2018 = LocalDate.of(2018,6, 5).atStartOfDay();
+        Count ld2018 = new Count(ldx2018);
+        Count ld2020 = new Count(ldx2020);
 
         RIDES.add(new Ride("Taron", park, 12723, ld2020));
         RIDES.add(new Ride("Raik", park, 13689, ld2020));

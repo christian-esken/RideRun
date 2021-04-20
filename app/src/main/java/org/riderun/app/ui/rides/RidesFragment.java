@@ -24,13 +24,17 @@ import org.riderun.app.model.Ride;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This Fragment shows several Rides, typically all Rides of a single Park.
+ * The rides table shows for each ride if it was counted and allows to count it.
+ */
 public class RidesFragment extends Fragment {
 
-    private RidesViewModel homeViewModel;
+    private RidesViewModel ridesViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
+        ridesViewModel =
                 new ViewModelProvider(this).get(RidesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_rides, container, false);
         final TextView textView = root.findViewById(R.id.textView_location);
@@ -38,7 +42,7 @@ public class RidesFragment extends Fragment {
         final TableLayout rideTable = root.findViewById(R.id.rideTable);
         rideTable.setBackgroundColor(Color.BLACK);
 
-        homeViewModel.ridesData().observe(getViewLifecycleOwner(), new Observer<RidesData>() {
+        ridesViewModel.ridesData().observe(getViewLifecycleOwner(), new Observer<RidesData>() {
             @Override
             public void onChanged(@Nullable RidesData rd) {
                 Park park = rd.park;
@@ -53,6 +57,7 @@ public class RidesFragment extends Fragment {
                 }
 
                 Context ctx = rideTable.getContext();
+                rideTable.removeAllViews();
                 TableRow th = new TableRow(ctx);
                 th.setBackgroundColor(Color.LTGRAY);
                 TextView thRide = new TextView(ctx);
@@ -68,30 +73,37 @@ public class RidesFragment extends Fragment {
                     tr.setBackgroundColor(Color.WHITE);
 
                     LocalDate countDate = ride.getCountDate();
-                    final View countView;
+                    final Button countButton;
                     if (countDate == null) {
                         Button button = new Button(ctx);
                         button.setText("Count");
                         //button.setBackgroundColor(Color.YELLOW);
                         button.setTextColor(Color.BLUE);
-                        countView = button;
+                        countButton = button;
                     } else {
-                        // Clicking the button mans: Edit or add a repeated ride
-                        TextView button = new Button(ctx);
+                        // Clicking the button means: Edit or add a repeated ride
+                        Button button = new Button(ctx);
                         button.setText(countDate.toString());
                         //button.setBackgroundColor(Color.LTGRAY);
-                        countView = button;
+                        countButton = button;
                     }
+
+                    countButton.setOnClickListener(view -> openDialog(view, ride));
 
                     TextView tv1 = new TextView(ctx);
                     tv1.setText(ride.name());
                     tr.addView(tv1);
-                    tr.addView(countView);
+                    tr.addView(countButton);
                     rideTable.addView(tr);
                 }
 
             }
         });
         return root;
+    }
+
+    private void openDialog(View view, Ride ride) {
+        CountDialog dialog = new CountDialog(ride, ridesViewModel);
+        dialog.show(this.getParentFragmentManager(), "info");
     }
 }
