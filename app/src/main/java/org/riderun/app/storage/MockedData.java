@@ -1,5 +1,6 @@
 package org.riderun.app.storage;
 
+import org.jetbrains.annotations.NotNull;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.Park;
@@ -22,20 +23,19 @@ public class MockedData {
         Park park = new Park("Phantasialand", 4872, city, 50.833333, 6.9);
         PARKS.add(park);
 
-        LocalDateTime ldx2020 = LocalDate.of(2020,9, 16).atStartOfDay();
-        LocalDateTime ldx2018 = LocalDate.of(2018,6, 5).atStartOfDay();
-        Count ld2018 = new Count(ldx2018);
-        Count ld2020 = new Count(ldx2020);
-
-        RIDES.add(new Ride("Taron", park, 12723, ld2020));
-        RIDES.add(new Ride("Raik", park, 13689, ld2020));
+        RIDES.add(new Ride("Taron", park, 12723, ld(2020)));
+        RIDES.add(new Ride("Raik", park, 13689, ld(2020)));
         RIDES.add(new Ride("F.L.Y.", park, 15201, null));
         RIDES.add(new Ride("Crazy Bats", park, 980, null));
-        RIDES.add(new Ride("Colorado Adventure", park, 978, ld2018));
-        RIDES.add(new Ride("Black Mamba", park, 3117, ld2018));
+        RIDES.add(new Ride("Colorado Adventure", park, 978, ld(2018)));
+        RIDES.add(new Ride("Black Mamba", park, 3117, ld(2018)));
         // The Winja's have only one ID on RCDB, but can be counted separately on Coaster Count
         RIDES.add(new Ride("Winja's Fear", park, 1235, null));
-        RIDES.add(new Ride("Winja's Force", park, 1235, ld2020));
+        RIDES.add(new Ride("Winja's Force", park, 1235, ld(2020)));
+    }
+
+    private static Count ld(int year) {
+        return new Count(LocalDate.of(year,9, 16).atStartOfDay());
     }
 
 
