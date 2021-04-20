@@ -1,6 +1,7 @@
 package org.riderun.app.ui.rides;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class RidesFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.textView_location);
         final TextView counts = root.findViewById(R.id.textViewCounts);
         final TableLayout rideTable = root.findViewById(R.id.rideTable);
+        rideTable.setBackgroundColor(Color.BLACK);
 
         homeViewModel.ridesData().observe(getViewLifecycleOwner(), new Observer<RidesData>() {
             @Override
@@ -51,18 +53,34 @@ public class RidesFragment extends Fragment {
                 }
 
                 Context ctx = rideTable.getContext();
+                TableRow th = new TableRow(ctx);
+                th.setBackgroundColor(Color.LTGRAY);
+                TextView thRide = new TextView(ctx);
+                thRide.setText("Ride");
+                TextView thCount = new TextView(ctx);
+                thCount.setText("Count");
+                th.addView(thRide);
+                th.addView(thCount);
+                rideTable.addView(th);
+
                 for (Ride ride : rides) {
                     TableRow tr = new TableRow(ctx);
+                    tr.setBackgroundColor(Color.WHITE);
+
                     LocalDate countDate = ride.getCountDate();
                     final View countView;
                     if (countDate == null) {
                         Button button = new Button(ctx);
                         button.setText("Count");
+                        //button.setBackgroundColor(Color.YELLOW);
+                        button.setTextColor(Color.BLUE);
                         countView = button;
                     } else {
-                        TextView tv2 = new TextView(ctx);
-                        tv2.setText(countDate.toString());
-                        countView = tv2;
+                        // Clicking the button mans: Edit or add a repeated ride
+                        TextView button = new Button(ctx);
+                        button.setText(countDate.toString());
+                        //button.setBackgroundColor(Color.LTGRAY);
+                        countView = button;
                     }
 
                     TextView tv1 = new TextView(ctx);

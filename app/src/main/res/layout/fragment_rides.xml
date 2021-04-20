@@ -5,6 +5,15 @@
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="1dp"
+    android:layout_marginHorizontal="1dp"
+    android:layout_marginVertical="1dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginTop="1dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="1dp"
     android:orientation="vertical"
     tools:context="org.riderun.app.ui.rides.RidesFragment">
 
@@ -25,8 +34,12 @@
             android:id="@+id/textView_location"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="1"
-            android:text="TextView"
+            android:autoSizeMaxTextSize="32dp"
+            android:autoSizeTextType="uniform"
             android:textAlignment="center" />
 
         <TextView
@@ -34,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_weight="0"
-            android:text="TextView" />
+            android:textSize="24sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -74,7 +87,16 @@
 
     <TableLayout
         android:id="@+id/rideTable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:paddingHorizontal="2dp"
+        android:paddingVertical="2dp"
+        android:paddingStart="2dp"
+        android:paddingLeft="2dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="2dp"
+        android:paddingRight="2dp"
+        android:paddingBottom="2dp" />
 
 </LinearLayout>
