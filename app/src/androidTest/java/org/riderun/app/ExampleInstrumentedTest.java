@@ -1,4 +1,4 @@
-package com.example.riderun;
+package org.riderun.app;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.riderun", appContext.getPackageName());
+        assertEquals("org.riderun.app", appContext.getPackageName());
     }
 }

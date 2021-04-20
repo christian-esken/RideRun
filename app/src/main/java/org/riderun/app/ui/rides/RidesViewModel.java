@@ -1,8 +1,8 @@
-package com.example.riderun.ui.rides;
+package org.riderun.app.ui.rides;
 
-import com.example.riderun.model.Park;
-import com.example.riderun.model.Ride;
-import com.example.riderun.storage.MockedData;
+import org.riderun.app.model.Park;
+import org.riderun.app.model.Ride;
+import org.riderun.app.storage.MockedData;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.riderun.ui.notifications;
+package org.riderun.app.ui.parks;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,19 +12,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.riderun.R;
+import org.riderun.app.R;
 
-public class NotificationsFragment extends Fragment {
+public class ParksFragment extends Fragment {
 
-    private NotificationsViewModel notificationsViewModel;
+    private ParksViewModel oarksViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                new ViewModelProvider(this).get(NotificationsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_notifications, container, false);
-        final TextView textView = root.findViewById(R.id.text_notifications);
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        oarksViewModel =
+                new ViewModelProvider(this).get(ParksViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_parks, container, false);
+        final TextView textView = root.findViewById(R.id.text_parks);
+        oarksViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

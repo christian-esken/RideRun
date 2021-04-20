@@ -1,4 +1,4 @@
-package com.example.riderun.model;
+package org.riderun.app.model;
 
 import java.time.LocalDate;
 

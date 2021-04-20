@@ -1,21 +1,14 @@
-package com.example.riderun.model;
+package org.riderun.app.model;
 
-import java.time.LocalDate;
-
-public class Park {
+public class City {
     private final String name;
     private final int rcdbId;
-    private final  City city;
     private final double longitude;
     private final double latitude;
-    // description
-    // image
-    // location / how to find
 
-    public Park(String name, int rcdbId, City city, double longitude, double latitude) {
+    public City(String name, int rcdbId, double latitude, double longitude) {
         this.name = name;
         this.rcdbId = rcdbId;
-        this.city = city;
         this.longitude = longitude;
         this.latitude = latitude;
     }
@@ -26,10 +19,6 @@ public class Park {
 
     public int getRcdbId() {
         return rcdbId;
-    }
-
-    public City getCity() {
-        return city;
     }
 
     public double getLongitude() {

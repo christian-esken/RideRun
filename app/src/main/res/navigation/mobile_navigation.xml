@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_rides"
-        android:name="com.example.riderun.ui.rides.RidesFragment"
+        android:name="org.riderun.app.ui.rides.RidesFragment"
         android:label="@string/title_rides"
         tools:layout="@layout/fragment_rides" />
 
     <fragment
         android:id="@+id/navigation_parks"
-        android:name="com.example.riderun.ui.parks.ParksFragment"
+        android:name="org.riderun.app.ui.parks.ParksFragment"
         android:label="@string/title_parks"
         tools:layout="@layout/fragment_parks" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.riderun.ui.notifications.NotificationsFragment"
+        android:name="org.riderun.app.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

@@ -1,16 +1,16 @@
-package com.example.riderun.ui.parks;
+package org.riderun.app.ui.notifications;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ParksViewModel extends ViewModel {
+public class NotificationsViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public ParksViewModel() {
+    public NotificationsViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("Park Selector");
+        mText.setValue("Notifications");
     }
 
     public LiveData<String> getText() {

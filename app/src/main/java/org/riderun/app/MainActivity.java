@@ -1,7 +1,8 @@
-package com.example.riderun;
+package org.riderun.app;
 
 import android.os.Bundle;
 
+import org.riderun.app.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;

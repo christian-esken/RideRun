@@ -1,8 +1,8 @@
-package com.example.riderun.storage;
+package org.riderun.app.storage;
 
-import com.example.riderun.model.City;
-import com.example.riderun.model.Park;
-import com.example.riderun.model.Ride;
+import org.riderun.app.model.City;
+import org.riderun.app.model.Park;
+import org.riderun.app.model.Ride;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

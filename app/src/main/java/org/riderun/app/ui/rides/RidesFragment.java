@@ -1,4 +1,4 @@
-package com.example.riderun.ui.rides;
+package org.riderun.app.ui.rides;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,13 +16,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.riderun.R;
-import com.example.riderun.model.Park;
-import com.example.riderun.model.Ride;
+import org.riderun.app.R;
+import org.riderun.app.model.Park;
+import org.riderun.app.model.Ride;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class RidesFragment extends Fragment {
 

@@ -1,7 +1,7 @@
-package com.example.riderun.ui.rides;
+package org.riderun.app.ui.rides;
 
-import com.example.riderun.model.Park;
-import com.example.riderun.model.Ride;
+import org.riderun.app.model.Park;
+import org.riderun.app.model.Ride;
 
 import java.util.List;
 

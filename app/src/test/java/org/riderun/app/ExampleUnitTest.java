@@ -1,4 +1,4 @@
-package com.example.riderun;
+package org.riderun.app;
 
 import org.junit.Test;
 
