@@ -13,21 +13,43 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.riderun.app.R;
+import org.riderun.app.model.Park;
+import org.riderun.app.storage.ParksMockStorage;
+import org.riderun.app.storage.ParksStorage;
+
+import java.util.List;
 
 public class ParksFragment extends Fragment {
 
-    private ParksViewModel oarksViewModel;
+    ParksStorage parksStorage;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        oarksViewModel =
-                new ViewModelProvider(this).get(ParksViewModel.class);
+
+        parksStorage = new ParksMockStorage();
+        ParksViewModel parksViewModel = new ViewModelProvider(this).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
         final TextView textView = root.findViewById(R.id.text_parks);
-        oarksViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        List<Park> parks = parksStorage.byName("fun", 10);
+
+        final String firstParkName;
+        if (parks.isEmpty()) {
+            firstParkName = "No matching park .. clear filters";
+        } else {
+            Park park = parks.get(0);
+            firstParkName = park.getName();
+        }
+
+        textView.setText(firstParkName);
+
+
+        parksViewModel.getParksData().observe(getViewLifecycleOwner(), new Observer<ParksData>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onChanged(@Nullable ParksData parksData)
+            {
+                List<Park> parksList = parksData.parks;
+                String firstParkInList = parksList.isEmpty() ? "---" : parksList.get(0).getName();
+                textView.setText(firstParkInList);
             }
         });
         return root;
