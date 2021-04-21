@@ -1,13 +1,11 @@
 package org.riderun.app.storage;
 
-import org.jetbrains.annotations.NotNull;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +15,7 @@ public class MockedData {
     private static final List<City> CITIES = new ArrayList<>(100);
 
     static {
-        City city = new City("Brühl", 25873, 50.833333, 6.9);
+        City city = new City("Brühl", 1, 25873, "DE", 50.833333, 6.9);
         CITIES.add(city);
 
         Park park = new Park("Phantasialand", 4872, city, 50.833333, 6.9);
