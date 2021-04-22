@@ -3,6 +3,7 @@ package org.riderun.app.ui.rides;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
 import org.riderun.app.storage.MockedData;
+import org.riderun.app.storage.mock.ParkMock;
 
 import java.util.List;
 
@@ -17,7 +18,9 @@ public class RidesViewModel extends ViewModel {
     List<Ride> rides;
 
     public RidesViewModel() {
-        park = MockedData.parks().get(0);
+        ParkMock parks = ParkMock.instance();
+        park = parks.parks().get(0);
+        //park = MockedData.parks().get(0);
         rides = MockedData.rides();
         RidesData rdata = new RidesData(park, rides);
         data.setValue(rdata);
