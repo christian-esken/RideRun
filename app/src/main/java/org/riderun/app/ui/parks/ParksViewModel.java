@@ -10,10 +10,9 @@ public class ParksViewModel extends ViewModel {
 
     private MutableLiveData<ParksData> parksData = new MutableLiveData<>();
 
-
     public ParksViewModel() {
-        ParkMock parkMock = new ParkMock();
-        ParksData rdata = new ParksData(parkMock.parks());
+        ParkMock parkMock = ParkMock.instance();
+        ParksData rdata = new ParksData(parkMock.parks(25));
         parksData.setValue(rdata);
     }
 

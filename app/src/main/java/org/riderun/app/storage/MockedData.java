@@ -11,16 +11,13 @@ import java.util.List;
 
 public class MockedData {
     private static final List<Ride> RIDES = new ArrayList<>(100);
-    private static final List<Park> PARKS = new ArrayList<>(100);
-    private static final List<City> CITIES = new ArrayList<>(100);
 
     static {
+        // TODO Replace this City and Park by using a city from CityMock / ParkMock
         City city = new City("Brühl", 1, 25873, "DE", 50.833333, 6.9);
-        CITIES.add(city);
-
         Park park = new Park("Phantasialand", 4872, city, 50.833333, 6.9);
-        PARKS.add(park);
 
+        // TODO Replace this by a new RideMock, similar to ParkMock and CityMock
         RIDES.add(new Ride("Taron", park, 12723, ld(2020)));
         RIDES.add(new Ride("Raik", park, 13689, ld(2020)));
         RIDES.add(new Ride("F.L.Y.", park, 15201, null));
@@ -36,17 +33,7 @@ public class MockedData {
         return new Count(LocalDate.of(year,9, 16).atStartOfDay());
     }
 
-
     public static List<Ride> rides() {
         return RIDES;
     }
-
-    public static List<Park> parks() {
-        return PARKS;
-    }
-
-    public static List<City> cities() {
-        return CITIES;
-    }
-
 }

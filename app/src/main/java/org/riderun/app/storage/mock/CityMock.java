@@ -22,7 +22,7 @@ public class CityMock {
     }
 
     // private. Use  CityMock.instance() instead
-    public CityMock() {
+    private CityMock() {
         InputStream is = RideRunApplication.getAppContext().getResources().openRawResource(R.raw.city_mock);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("utf-8")));
         try {

@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParksMockStorage implements ParksStorage {
+    private final static ParksMockStorage instance = new ParksMockStorage();
     private final ParkMock parkMock;
 
-    public ParksMockStorage() {
-        this.parkMock = new ParkMock();
+    private ParksMockStorage() {
+        this.parkMock = ParkMock.instance();
+    }
+
+    public static ParksMockStorage instance() {
+        return instance;
     }
 
     @Override

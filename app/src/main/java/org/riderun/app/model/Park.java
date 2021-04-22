@@ -37,6 +37,6 @@ public class Park {
     }
 
     public GeoCoordinate getGeoCoordinate() {
-        return geoCoordinate;
+        return geoCoordinate.isEmpty() ? city.getGeoCoordinate() : geoCoordinate;
     }
 }

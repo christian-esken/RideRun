@@ -20,7 +20,6 @@ public class RidesViewModel extends ViewModel {
     public RidesViewModel() {
         ParkMock parks = ParkMock.instance();
         park = parks.parks().get(0);
-        //park = MockedData.parks().get(0);
         rides = MockedData.rides();
         RidesData rdata = new RidesData(park, rides);
         data.setValue(rdata);

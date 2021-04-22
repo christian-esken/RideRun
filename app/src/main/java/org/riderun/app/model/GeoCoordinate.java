@@ -32,4 +32,23 @@ public class GeoCoordinate {
         return geoPrecision == GeoPrecision.None;
     }
 
+    /**
+     * Returns human readable geo coordinates. If the expectedPrecision does not match
+     * the precision of this GeoCoordinate, this precision will be added to the String.
+     * This has the purpose of showing to the user that it is NOT the GeoCoordinate of
+     * the Park, but that of the City.
+     *
+     * @param expectedPrecision
+     * @return human readable geo coordinates
+     */
+    public String toStringShort(GeoPrecision expectedPrecision) {
+        if (isEmpty()) {
+            return "";
+        }
+        String geo = "(" + longitude + "," + latitude;
+        if (expectedPrecision != geoPrecision) {
+            geo += " - " + geoPrecision;
+        }
+        return geo + ")";
+    }
 }

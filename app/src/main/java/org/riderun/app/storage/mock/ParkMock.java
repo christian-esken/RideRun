@@ -23,7 +23,7 @@ public class ParkMock {
     }
 
     // private. Use  ParkMock.instance() instead
-    public ParkMock() {
+    private ParkMock() {
         CityMock cityMock = CityMock.instance();
         InputStream is = RideRunApplication.getAppContext().getResources().openRawResource(R.raw.park_mock);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("utf-8")));
@@ -50,4 +50,10 @@ public class ParkMock {
     public List<Park> parks() {
         return PARKS;
     }
+
+    // Test method: Return the first "count" Parks
+    public List<Park> parks(int count) {
+        return PARKS.subList(0, count);
+    }
+
 }
