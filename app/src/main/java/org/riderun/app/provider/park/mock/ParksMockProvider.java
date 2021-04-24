@@ -1,20 +1,20 @@
-package org.riderun.app.storage;
+package org.riderun.app.provider.park.mock;
 
 import org.riderun.app.model.Park;
-import org.riderun.app.storage.mock.ParkMock;
+import org.riderun.app.provider.park.ParksProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParksMockStorage implements ParksStorage {
-    private final static ParksMockStorage instance = new ParksMockStorage();
-    private final ParkMock parkMock;
+public class ParksMockProvider implements ParksProvider {
+    private final static ParksMockProvider instance = new ParksMockProvider();
+    private final ParkMockReader parkMock;
 
-    private ParksMockStorage() {
-        this.parkMock = ParkMock.instance();
+    private ParksMockProvider() {
+        this.parkMock = ParkMockReader.instance();
     }
 
-    public static ParksMockStorage instance() {
+    public static ParksMockProvider instance() {
         return instance;
     }
 

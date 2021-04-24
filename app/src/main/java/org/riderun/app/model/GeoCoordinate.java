@@ -1,7 +1,7 @@
 package org.riderun.app.model;
 
 /**
- * A Geo Coordinate in ... format
+ * A Geo Coordinate in ... format. Will probably be WGS 84.
  */
 public class GeoCoordinate {
     private final static GeoCoordinate EMPTY = new GeoCoordinate(-1000,-1000, GeoPrecision.None);
@@ -9,11 +9,29 @@ public class GeoCoordinate {
     private final double latitude;
     private final GeoPrecision geoPrecision;
 
+    /**
+     * Creates a geo position with a certain precision, e.g. the city center, country center
+     * or an exact position.
+     *
+     * @param latitude Latitude
+     * @param longitude Longitude
+     */
     public GeoCoordinate(double latitude, double longitude, GeoPrecision geoPrecision) {
         this.longitude = longitude;
         this.latitude = latitude;
         this.geoPrecision = geoPrecision;
     }
+
+    /**
+     * Creates an exact geo position, e.g. the map center, the map upper left boundary or the
+     * users current position
+     * @param latitude Latitude
+     * @param longitude Longitude
+     */
+    public GeoCoordinate(double latitude, double longitude) {
+        this(latitude, longitude, GeoPrecision.Exact);
+    }
+
 
     public static GeoCoordinate empty() {
         return EMPTY;

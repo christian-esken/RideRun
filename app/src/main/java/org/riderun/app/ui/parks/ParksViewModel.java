@@ -2,10 +2,11 @@ package org.riderun.app.ui.parks;
 
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
-import org.riderun.app.storage.mock.ParkMock;
+import org.riderun.app.provider.config.ConfigDefaultsProvider;
+import org.riderun.app.provider.config.ConfigProvider;
+import org.riderun.app.provider.park.mock.ParkMockReader;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -18,15 +19,15 @@ import androidx.lifecycle.ViewModel;
 public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
     private MutableLiveData<ParksData> parksData = new MutableLiveData<>();
-    private ParkMock parkProvider;
+    private ParkMockReader parkProvider;
 
     public ParksViewModel() {
         // Set providers
-        parkProvider = ParkMock.instance();
+        parkProvider = ParkMockReader.instance();
 
-        // Note: Once we have a ConfigProvider, we can start with the users last used filters
-        // For now, use hardcoded filters
-        ParksFilterCriteria filterCriteria = new ParksFilterCriteria(ParksPreselection.All, "", GeoCoordinate.empty(), LIMIT);
+        // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
+        ConfigProvider config = new ConfigDefaultsProvider();
+        ParksFilterCriteria filterCriteria = new ParksFilterCriteria(config.parkPreselection(), "", config.geoCoordinate(), config.parkLimit());
         // Hint: The filter will select
         ParksData appliedFilter = applyFilter(filterCriteria, parkProvider);
         parksData.setValue(appliedFilter);
@@ -42,7 +43,7 @@ public class ParksViewModel extends ViewModel {
      *                     limited list, e.g. the parks from aq given Country of Tour.
      * @return The matching, filtered and sorted Parks
      */
-    private ParksData applyFilter(ParksFilterCriteria criteria, ParkMock parkprovider) {
+    private ParksData applyFilter(ParksFilterCriteria criteria, ParkMockReader parkprovider) {
         String nameFilter = criteria.nameFilter.toLowerCase();
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
         boolean hasFilter = hasNameFilter; // currently there is only one filter

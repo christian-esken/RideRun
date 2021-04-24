@@ -1,9 +1,10 @@
-package org.riderun.app.storage.mock;
+package org.riderun.app.provider.park.mock;
 
 import org.riderun.app.R;
 import org.riderun.app.RideRunApplication;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Park;
+import org.riderun.app.provider.city.mock.CityMock;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,18 +13,18 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParkMock {
-    private static ParkMock instance = new ParkMock();
+public class ParkMockReader {
+    private static ParkMockReader instance = new ParkMockReader();
 
 
     private ArrayList<Park> PARKS = new ArrayList<>();
 
-    public static ParkMock instance() {
+    public static ParkMockReader instance() {
         return instance;
     }
 
     // private. Use  ParkMock.instance() instead
-    private ParkMock() {
+    private ParkMockReader() {
         CityMock cityMock = CityMock.instance();
         InputStream is = RideRunApplication.getAppContext().getResources().openRawResource(R.raw.park_mock);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("utf-8")));

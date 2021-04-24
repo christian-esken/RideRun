@@ -1,8 +1,9 @@
-package org.riderun.app.storage.mock;
+package org.riderun.app.provider.city.mock;
 
 import org.riderun.app.RideRunApplication;
 import org.riderun.app.model.City;
 import org.riderun.app.R;
+import org.riderun.app.provider.city.CityProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -11,7 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CityMock {
+public class CityMock implements CityProvider {
     private static CityMock instance = new CityMock();
     private static City UNKNOWN_CITY = new City("Unknown city", 0 , 0, "--");
 
