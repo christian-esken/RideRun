@@ -96,18 +96,29 @@
             android:text="Name" />
     </LinearLayout>
 
-    <TableLayout
-        android:id="@+id/rideTable"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:paddingHorizontal="2dp"
-        android:paddingVertical="2dp"
-        android:paddingStart="2dp"
-        android:paddingLeft="2dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="2dp"
-        android:paddingRight="2dp"
-        android:paddingBottom="2dp" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/rideTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:paddingHorizontal="2dp"
+                android:paddingVertical="2dp"
+                android:paddingStart="2dp"
+                android:paddingLeft="2dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="2dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="2dp" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
