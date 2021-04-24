@@ -4,4 +4,25 @@
     <string name="title_parks">Parks</string>
     <string name="title_notifications">Notifications</string>
     <string name="location_short">Location</string>
+
+    <!-- ParksSelector -->
+    <string name="parks_select_header">Select Parks</string>
+
+    <string name="parks_all_preselect">All</string>
+    <string name="parks_nearby_preselect">Nearby</string>
+    <string name="parks_location_preselect">Location</string>
+    <string name="parks_tour_preselect">Tour</string>
+
+    <string name="parks_filter_help">Choose search type above or filter by per name below.</string>
+
+    <string name="parks_name_filter">Nearby</string>
+
+    <!-- Gwo -->
+    <string name="geo_latitude">Latitude</string>
+    <string name="geo_longitude">Longitude</string>
+    <string name="geo_precision_continent">Continent</string>
+    <string name="geo_precision_country">Country</string>
+    <string name="geo_precision_city">City</string>
+    <string name="geo_precision_park">Park</string>
+    <string name="geo_precision_ride">Ride</string>
 </resources>

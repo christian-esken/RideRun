@@ -18,12 +18,17 @@ import androidx.lifecycle.ViewModel;
 public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
     private MutableLiveData<ParksData> parksData = new MutableLiveData<>();
-    private ParkMock parkprovider;
+    private ParkMock parkProvider;
 
     public ParksViewModel() {
-        parkprovider = ParkMock.instance();
-        ParksData rdata = new ParksData("", GeoCoordinate.empty(), LIMIT, Collections.emptyList());
-        ParksData appliedFilter = applyFilter(rdata, parkprovider);
+        // Set providers
+        parkProvider = ParkMock.instance();
+
+        // Note: Once we have a ConfigProvider, we can start with the users last used filters
+        // For now, use hardcoded filters
+        ParksFilterCriteria filterCriteria = new ParksFilterCriteria(ParksPreselection.All, "", GeoCoordinate.empty(), LIMIT);
+        // Hint: The filter will select
+        ParksData appliedFilter = applyFilter(filterCriteria, parkProvider);
         parksData.setValue(appliedFilter);
     }
 
@@ -32,12 +37,12 @@ public class ParksViewModel extends ViewModel {
      * sorted by the sort criteria (e.g. distance) and limited with the limit criteria.
      *
      * Filters the Parks from the parkprovider
-     * @param criteria Filter, Sort and Limit criteria
+     * @param criteria Filter, Sort and Limit criteria, and the park list
      * @param parkprovider The list of parks to take into account. It can be all parks, or a
      *                     limited list, e.g. the parks from aq given Country of Tour.
      * @return The matching, filtered and sorted Parks
      */
-    private ParksData applyFilter(ParksData criteria, ParkMock parkprovider) {
+    private ParksData applyFilter(ParksFilterCriteria criteria, ParkMock parkprovider) {
         String nameFilter = criteria.nameFilter.toLowerCase();
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
         boolean hasFilter = hasNameFilter; // currently there is only one filter
@@ -49,6 +54,7 @@ public class ParksViewModel extends ViewModel {
         List<Park> parksProviderParks = parkprovider.parks();
         List<Park> parksMatching = new ArrayList<>(parksProviderParks.size());
 
+        // WHERE
         if (hasFilter) {
             for (Park park : parksProviderParks) {
                 if (hasNameFilter && park.getName().toLowerCase().contains(nameFilter)) {
@@ -59,6 +65,7 @@ public class ParksViewModel extends ViewModel {
             parksMatching.addAll(parksProviderParks); // not filtered => all parks
         }
 
+        // ORDER BY
         if (hasSorting) {
             if (hasGeosorting) {
                 parksMatching.sort( (a,b) -> {
@@ -69,10 +76,10 @@ public class ParksViewModel extends ViewModel {
             }
         }
 
+        // LIMIT
         List<Park> parksLimited = parksMatching.subList(0,limit);
 
-        ParksData finalPD = new ParksData(nameFilter,geo,limit,parksLimited);
-        return finalPD;
+        return new ParksData(criteria, parksLimited);
     }
 
     public LiveData<ParksData> getParksData() {
