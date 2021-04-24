@@ -2,6 +2,8 @@ package org.riderun.app.ui.parks;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +48,19 @@ public class ParksFragment extends Fragment {
 
         //textView.setText("---");
 
-        parkNameFilter.setOnKeyListener((view,arg2,event)  -> {
-            parksViewModel.setParkNameFilter(parkNameFilter.getText().toString());
-            return true; // handled
+        parkNameFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                parksViewModel.setParkNameFilter(editable.toString());
+            }
         });
 
         parksViewModel.getLiveParksData().observe(getViewLifecycleOwner(), new Observer<ParksData>() {
