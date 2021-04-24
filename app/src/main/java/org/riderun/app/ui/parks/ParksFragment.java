@@ -1,9 +1,13 @@
 package org.riderun.app.ui.parks;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,10 +41,17 @@ public class ParksFragment extends Fragment {
         ParksViewModel parksViewModel = new ViewModelProvider(this).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
         final TextView textView = root.findViewById(R.id.text_parks);
+        final TableLayout parksTable = root.findViewById(R.id.parks_table);
+        final EditText parkNameFilter = root.findViewById(R.id.parks_name_filter);
 
-        textView.setText("---");
+        //textView.setText("---");
 
-        parksViewModel.getParksData().observe(getViewLifecycleOwner(), new Observer<ParksData>() {
+        parkNameFilter.setOnKeyListener((view,arg2,event)  -> {
+            parksViewModel.setParkNameFilter(parkNameFilter.getText().toString());
+            return true; // handled
+        });
+
+        parksViewModel.getLiveParksData().observe(getViewLifecycleOwner(), new Observer<ParksData>() {
             @Override
             public void onChanged(@Nullable ParksData parksData)
             {
@@ -50,18 +61,34 @@ public class ParksFragment extends Fragment {
                 //List<Park> parks = parksStorage.byName("fun", 10);
 
                 final String firstParkName;
+                parksTable.removeAllViews();
+                Context pctx = parksTable.getContext();
+
                 if (parksList.isEmpty()) {
-                    firstParkName = "No matching park .. clear filters";
+                    TextView tv = new TextView(pctx);
+                    tv.setText("No matching park .. clear filters"); // TODO translation
+                    parksTable.addView(tv);
                 } else {
-                    Park park = parksList.get(0);
-                    String geoCoord = park.getGeoCoordinate().toStringShort(GeoPrecision.Park);
-                    City city = park.getCity();
-                    firstParkName = park.getName() + " / " + city.getName()
-                            + " (" + city.getCountry2letter() + ")"
-                            + (geoCoord.isEmpty() ? "" : (" " + geoCoord)
-                    );
+                    for (Park park : parksList) {
+                        TableRow tr = new TableRow(pctx);
+                        Context ctx = tr.getContext();
+                        TextView parkName = new TextView(ctx);
+                        parkName.setText(park.getName());
+                        TextView cityName = new TextView(ctx);
+                        City city = park.getCity();
+                        cityName.setText(city.getName() + " (" + city.getCountry2letter() + ")");
+
+                        TextView geoView = new TextView(ctx);
+                        String geoString = park.getGeoCoordinate().toStringShort(GeoPrecision.Park);
+                        geoView.setText(geoString);
+
+                        tr.addView(parkName);
+                        tr.addView(cityName);
+                        tr.addView(geoView);
+
+                        parksTable.addView(tr);
+                    }
                 }
-                textView.setText(firstParkName);
             }
         });
 

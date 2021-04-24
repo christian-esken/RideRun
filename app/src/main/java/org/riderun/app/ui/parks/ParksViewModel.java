@@ -18,7 +18,7 @@ import androidx.lifecycle.ViewModel;
  */
 public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
-    private MutableLiveData<ParksData> parksData = new MutableLiveData<>();
+    private MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
     private ParkMockReader parkProvider;
 
     public ParksViewModel() {
@@ -28,9 +28,8 @@ public class ParksViewModel extends ViewModel {
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
         ParksFilterCriteria filterCriteria = new ParksFilterCriteria(config.parkPreselection(), "", config.geoCoordinate(), config.parkLimit());
-        // Hint: The filter will select
         ParksData appliedFilter = applyFilter(filterCriteria, parkProvider);
-        parksData.setValue(appliedFilter);
+        liveParksData.setValue(appliedFilter);
     }
 
     /**
@@ -78,12 +77,21 @@ public class ParksViewModel extends ViewModel {
         }
 
         // LIMIT
-        List<Park> parksLimited = parksMatching.subList(0,limit);
+        List<Park> parksLimited = parksMatching.subList(0, Math.min(limit, parksMatching.size()));
 
         return new ParksData(criteria, parksLimited);
     }
 
-    public LiveData<ParksData> getParksData() {
-        return parksData;
+    public void setParkNameFilter(String parkName) {
+        ParksData parksData = liveParksData.getValue();
+        ParksFilterCriteria fc = parksData.filterCriteria;
+        ParksFilterCriteria fcNew = new ParksFilterCriteria(fc.preselection, parkName, fc.geoCoordinate, fc.limit);
+
+        ParksData appliedFilter = applyFilter(fcNew, parkProvider);
+        liveParksData.postValue(appliedFilter);
+    }
+
+    public LiveData<ParksData> getLiveParksData() {
+        return liveParksData;
     }
 }
