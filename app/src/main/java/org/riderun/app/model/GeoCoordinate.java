@@ -1,5 +1,8 @@
 package org.riderun.app.model;
 
+/**
+ * A Geo Coordinate in ... format
+ */
 public class GeoCoordinate {
     private final static GeoCoordinate EMPTY = new GeoCoordinate(-1000,-1000, GeoPrecision.None);
     private final double longitude;
@@ -50,5 +53,23 @@ public class GeoCoordinate {
             geo += " - " + geoPrecision;
         }
         return geo + ")";
+    }
+
+    /**
+     * Returns the distance between this point and the other point, suitable for sorting by distance.
+     * The returned value is bigger if the distance is bigger. It has no other meaning, e.g. you
+     * MUST NOT assume that it is a true Geo Distance (neither Spherical Earth nor Ellipsoidal Earth
+     * nor any other model).
+     *
+     * @param other the other coordinate
+     * @return The distance. Never negative.
+     */
+    public double sortingDistance(GeoCoordinate other) {
+        // Hint: The full formula is sqrt(xdiff^2 + ydiff^2). For sorting purposes we do not need
+        // the sqrt, leading to xdiff^2 + ydiff^2 . The formula below drops also the ^2, which makes
+        // it inprecise but very fast. Note: Wc may call this very often, e.g. O(Parks ^2), meaning
+        // 10000 ^2  = 100_000_000. If smartphones are fast enough, we could switch to the formula
+        // including ^2.
+        return Math.abs(latitude - other.latitude) + Math.abs(longitude - other.longitude);
     }
 }

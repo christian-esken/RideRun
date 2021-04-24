@@ -11,8 +11,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+/**
+ * Business logic for the RideFragment.
+ */
 public class RidesViewModel extends ViewModel {
-
     private MutableLiveData<RidesData> data = new MutableLiveData<>();
     Park park;
     List<Ride> rides;
@@ -29,7 +31,10 @@ public class RidesViewModel extends ViewModel {
      * Informs that fields in the park or rides has changed
      */
     public void notifyFieldModification() {
-        data.postValue(new RidesData(park, rides));
+        //data.postValue(new RidesData(park, rides));
+        RidesData existingValue = data.getValue();
+        data.postValue(existingValue); // Re-POST the existing value (presuming fields have changed)
+        //data.postValue(new RidesData(park, rides));
     }
 
     /**

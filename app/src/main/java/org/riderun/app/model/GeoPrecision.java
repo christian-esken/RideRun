@@ -6,5 +6,6 @@ public enum GeoPrecision {
     Country,
     City,
     Park,
-    Ride
+    Ride,
+    Exact
 }

@@ -21,6 +21,12 @@ import org.riderun.app.storage.ParksStorage;
 
 import java.util.List;
 
+/**
+ * The ParksFragment shows a list of parks, and allows to chose a park to be displayed in the
+ * {@link org.riderun.app.ui.rides.RidesFragment}. The list shows the most relevant parks
+ * according to the users selection criteria. Selection criteria can be distance, park name,
+ * park type (water park, has real-coaster, has alpinecoaster).
+ */
 public class ParksFragment extends Fragment {
 
     ParksStorage parksStorage;
@@ -38,6 +44,7 @@ public class ParksFragment extends Fragment {
             @Override
             public void onChanged(@Nullable ParksData parksData)
             {
+                // Model changed => update GUI.
                 List<Park> parksList = parksData.parks;
 
                 //List<Park> parks = parksStorage.byName("fun", 10);
