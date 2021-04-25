@@ -51,7 +51,8 @@ public class ParksViewModel extends ViewModel {
         boolean hasSorting = hasGeosorting;
 
         int limit = criteria.limit;
-        List<Park> parksProviderParks = parkprovider.parks();
+        // PRESELECTION : TODO Implement the other preselection methods (currently always: ALL)
+        List<Park> parksProviderParks = parkprovider.parks(); // PRESELECTION: ALL
         List<Park> parksMatching = new ArrayList<>(parksProviderParks.size());
 
         // WHERE
@@ -79,7 +80,7 @@ public class ParksViewModel extends ViewModel {
         // LIMIT
         List<Park> parksLimited = parksMatching.subList(0, Math.min(limit, parksMatching.size()));
 
-        return new ParksData(criteria, parksLimited);
+        return new ParksData(criteria, parksLimited, parksMatching);
     }
 
     public void setParkNameFilter(String parkName) {

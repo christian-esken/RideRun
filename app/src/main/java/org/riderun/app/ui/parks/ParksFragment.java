@@ -95,14 +95,21 @@ public class ParksFragment extends Fragment {
                 preselectionTour.setChecked(preselection == ParksPreselection.Tour);
 
                 // Preselection specific filter criteria
+
+                // Preselection specific filter criteria: Location (continent, country, city)
+                List<Park> preselectedParks = parksData.unfilteredPreselectedParks;
                 Set<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
                 Set<String> countries = new TreeSet<>();
                 Set<String> continents = new TreeSet<>();
-                for (Park park : parksList) {
+                for (Park park : preselectedParks) {
                     City city = park.getCity();
+                    // TODO Only cities matching the country or continent should be shown
                     cities.add(city);
+                    // TODO Only countries matching the continent should be shown
                     countries.add(city.getCountry2letter());
                 }
+                // TODO Continents should be derived from the country, but we do not have a
+                //      CountryProvider yet.
                 continents.add("Africa");
                 continents.add("America");
                 continents.add("Asia");
