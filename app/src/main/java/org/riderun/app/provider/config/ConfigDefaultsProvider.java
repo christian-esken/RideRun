@@ -11,7 +11,7 @@ public class ConfigDefaultsProvider implements ConfigProvider {
 
     @Override
     public ParksPreselection parkPreselection() {
-        return ParksPreselection.Nearby;
+        return ParksPreselection.Location;
     }
 
     @Override

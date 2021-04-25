@@ -10,7 +10,7 @@ import java.util.List;
  * {@link ParksViewModel}.
  */
 public class ParksData {
-    ParksFilterCriteria filterCriteria;
+    final ParksFilterCriteria filterCriteria;
     // The list of Parks, as a result of hte filters
     final List<Park> parks;
 

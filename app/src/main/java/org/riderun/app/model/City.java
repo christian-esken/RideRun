@@ -1,5 +1,9 @@
 package org.riderun.app.model;
 
+import org.riderun.app.storage.Order;
+
+import java.util.Comparator;
+
 public class City {
     private final String name;
     private final int cityId;
@@ -42,5 +46,15 @@ public class City {
 
     public GeoCoordinate getGeoCoordinate() {
         return geoCoordinate;
+    }
+
+    public static Comparator<City> orderByName(Order order) {
+        return new Comparator<City>() {
+            @Override
+            public int compare(City a, City b) {
+                int result = a.getName().compareTo(b.getName());
+                return order == Order.ASC ? result : -result;
+            }
+        };
     }
 }
