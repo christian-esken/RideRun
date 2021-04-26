@@ -27,7 +27,10 @@ public class ParksViewModel extends ViewModel {
 
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
-        ParksFilterCriteria filterCriteria = new ParksFilterCriteria(config.parkPreselection(), "", config.geoCoordinate(), config.parkLimit());
+        ParksFilterCriteria filterCriteria = new ParksFilterCriteria.Builder()
+                .preselection(config.parkPreselection())
+                .geoCoordinate(config.geoCoordinate())
+                .limit(config.parkLimit()).build();
         ParksData appliedFilter = applyFilter(filterCriteria, parkProvider);
         liveParksData.setValue(appliedFilter);
     }
@@ -52,18 +55,43 @@ public class ParksViewModel extends ViewModel {
 
         int limit = criteria.limit;
         // PRESELECTION : TODO Implement the other preselection methods (currently always: ALL)
-        List<Park> parksProviderParks = parkprovider.parks(); // PRESELECTION: ALL
-        List<Park> parksMatching = new ArrayList<>(parksProviderParks.size());
+        final List<Park> parkList;
+        switch (criteria.preselection) {
+            case All:
+                parkList = parkprovider.parks();
+                break;
+            case Location:
+                parkList = new ArrayList<>();
+                String cc = criteria.locationCountryCode2letter;
+                if (cc != null) {
+                    for (Park park : parkprovider.parks()) {
+                        if (cc.equals(park.getCity().getCountry2letter())) {
+                            parkList.add(park);
+                        }
+                    }
+                }
+                // TODO Also implement city and continent preselection
+                break;
+            case Tour:
+                throw new UnsupportedOperationException("Tour not yet implemented");
+            case Nearby:
+                throw new UnsupportedOperationException("Nearby not yet implemented");
+            default:
+                // TODO Log warning
+                parkList = parkprovider.parks();
+                break;
+        }
+        List<Park> parksMatching = new ArrayList<>(parkList.size());
 
         // WHERE
         if (hasFilter) {
-            for (Park park : parksProviderParks) {
+            for (Park park : parkList) {
                 if (hasNameFilter && park.getName().toLowerCase().contains(nameFilter)) {
                     parksMatching.add(park);
                 }
             }
         } else {
-            parksMatching.addAll(parksProviderParks); // not filtered => all parks
+            parksMatching.addAll(parkList); // not filtered => all parks
         }
 
         // ORDER BY
@@ -84,13 +112,50 @@ public class ParksViewModel extends ViewModel {
     }
 
     public void setParkNameFilter(String parkName) {
-        ParksData parksData = liveParksData.getValue();
-        ParksFilterCriteria fc = parksData.filterCriteria;
-        ParksFilterCriteria fcNew = new ParksFilterCriteria(fc.preselection, parkName, fc.geoCoordinate, fc.limit);
-
-        ParksData appliedFilter = applyFilter(fcNew, parkProvider);
-        liveParksData.postValue(appliedFilter);
+        postModifiedFilter(fc().nameFilter(parkName));
     }
+
+    public void setLocationContinent(String continent) {
+        postModifiedFilter(fc().locationContinent(continent));
+    }
+
+    public void setLocationCountry(String cc2letter) {
+        postModifiedFilter(fc().locationCountryCode2letter(cc2letter));
+    }
+
+    public void setLocationCityId(Integer cityId) {
+        postModifiedFilter(fc().locationCityId(cityId));
+    }
+
+    /**
+     * Returns a new FilterCriteria.Builder from the current ParksFilterCriteria.
+     * @return the builder
+     */
+    private ParksFilterCriteria.Builder fc() {
+        ParksFilterCriteria fc = liveParksData.getValue().filterCriteria;
+        return ParksFilterCriteria.Builder.builder(fc);
+    }
+
+    private void postModifiedFilter(ParksFilterCriteria.Builder fcBuilder) {
+        ParksFilterCriteria fcNew = fcBuilder.build();
+        ParksFilterCriteria fcOld = liveParksData.getValue().filterCriteria;
+        if (!fcNew.equals(fcOld)) {
+            // Filter criteria has been modified => notify the LiveData
+            // Note: This has two goals: Avoid unnecessary GUI rebuilds, and avoid infinite "recursion".
+            //  Infinite recursions could happen like this: User changes "park name"
+            //  -> ParksFragment (see TextWatcher).
+            //  -> TextWatcher.afterTextChanged()
+            //  -> ParksViewModel.setParkNameFilter()
+            //  -> ParksViewModel.postModifiedFilter()
+            //  -> liveParksData.postValue(parksData)
+            //  -> ParksFragment (see TextWatcher)
+            //  ...
+            ParksData parksData = applyFilter(fcNew, parkProvider);
+            liveParksData.postValue(parksData);
+        }
+    }
+
+
 
     public LiveData<ParksData> getLiveParksData() {
         return liveParksData;

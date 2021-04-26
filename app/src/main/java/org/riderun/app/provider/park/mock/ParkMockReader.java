@@ -4,7 +4,7 @@ import org.riderun.app.R;
 import org.riderun.app.RideRunApplication;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Park;
-import org.riderun.app.provider.city.mock.CityMock;
+import org.riderun.app.provider.city.mock.CityMockProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ public class ParkMockReader {
 
     // private. Use  ParkMock.instance() instead
     private ParkMockReader() {
-        CityMock cityMock = CityMock.instance();
+        CityMockProvider cityMock = CityMockProvider.instance();
         InputStream is = RideRunApplication.getAppContext().getResources().openRawResource(R.raw.park_mock);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("utf-8")));
         try {
@@ -35,7 +35,7 @@ public class ParkMockReader {
                 String[] fields = line.split(";");
 
                 int cityId = Integer.parseInt(fields[2]);
-                City city = cityMock.byCityId(cityId);
+                City city = cityMock.byCityId(cityId, true);
 
                 PARKS.add(new Park(
                         fields[0],

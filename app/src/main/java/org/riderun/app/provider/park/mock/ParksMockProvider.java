@@ -19,6 +19,11 @@ public class ParksMockProvider implements ParksProvider {
     }
 
     @Override
+    public List<Park> all() {
+        return parkMock.parks();
+    }
+
+    @Override
     public List<Park> byName(String name, int count) {
         List<Park> matchingParks = new ArrayList<>(count);
         List<Park> parks = parkMock.parks();
