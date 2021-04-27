@@ -63,12 +63,15 @@ public class ParksViewModel extends ViewModel {
             case Location:
                 parkList = new ArrayList<>();
                 String cc = criteria.locationCountryCode2letter;
+                List<Park> parks = parkprovider.parks();
                 if (cc != null) {
-                    for (Park park : parkprovider.parks()) {
+                    for (Park park : parks) {
                         if (cc.equals(park.getCity().getCountry2letter())) {
                             parkList.add(park);
                         }
                     }
+                } else {
+                    parkList.addAll(parks);
                 }
                 // TODO Also implement city and continent preselection
                 break;

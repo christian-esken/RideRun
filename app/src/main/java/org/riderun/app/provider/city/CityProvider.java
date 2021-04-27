@@ -4,6 +4,8 @@ import org.riderun.app.model.City;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 public interface CityProvider {
     // Returns all cities konw to this Provider
     List<City> cities();
@@ -23,8 +25,8 @@ public interface CityProvider {
 
     /**
      * Returns all cities with the exact city name
-     * @param cityName cit yname
+     * @param cityName city name
      * @return Matching cities. Empty if no city matches
      */
-    List<City> byCityName(String cityName);
+    List<City> byCityName(@NonNull String cityName);
 }

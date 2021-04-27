@@ -28,6 +28,7 @@ import org.riderun.app.provider.park.mock.ParksMockProvider;
 import org.riderun.app.storage.Order;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,59 +91,22 @@ public class ParksFragment extends Fragment {
             }
         });
 
-        spinnerContinent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                String newValue = (String) adapterView.getItemAtPosition(pos);
-                if (SPINNER_DEFAULT_ALL.equals(newValue)) {
-                    parksViewModel.setLocationContinent(null);
-                } else {
-                    parksViewModel.setLocationContinent(newValue);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                parksViewModel.setLocationContinent(null);
-            }
+        spinnerContinent.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
+            void set(String newValue) { parksViewModel.setLocationContinent(newValue); }
         });
 
-        spinnerCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                String newValue = (String) adapterView.getItemAtPosition(pos);
-                if (SPINNER_DEFAULT_ALL.equals(newValue)) {
-                    parksViewModel.setLocationCountry(null);
-                } else {
-                    parksViewModel.setLocationCountry(newValue);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                parksViewModel.setLocationCountry(null);
-            }
+        spinnerCountry.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
+            void set(String newValue) { parksViewModel.setLocationCountry(newValue); }
         });
 
-        spinnerCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                String newValue = (String) adapterView.getItemAtPosition(pos);
-                if (SPINNER_DEFAULT_ALL.equals(newValue)) {
-                    parksViewModel.setLocationCityId(null);
-                } else {
-                    List<City> cities = cityProvider.byCityName(newValue);
-                    if (!cities.isEmpty()) {
-                        // TODO If there are two cities with the same name, we will just pick the
-                        // first one. The fix for this will be to upgrade the Adapter from String to City.
-                        parksViewModel.setLocationCityId(cities.get(0).getCityId());
-                    }
-                }
-            }
+        spinnerCity.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
+            void set(String newValue) {
+                List<City> cities = newValue == null ? Collections.emptyList() : cityProvider.byCityName(newValue);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                parksViewModel.setLocationCityId(null);
+                // TODO If there are two cities with the same name, we will just pick the
+                // first one. The fix for this will be to upgrade the Adapter from String to City.
+                Integer cityId = cities.isEmpty() ? null : cities.get(0).getCityId();
+                parksViewModel.setLocationCityId(cityId);
             }
         });
 
@@ -193,19 +157,13 @@ public class ParksFragment extends Fragment {
                     }
                     // TODO Continent matching
                     if (geoLevel == null) {
-                        // TODO consider to remove the next line. Currently it has no effect,
-                        // as all citiés will be added in the for loop below, due to "geoLevel == GeoLevel.World "
                         cityProvider.cities().forEach(city -> cityIdMap.put(city.getCityId(), city));
                         geoLevel = GeoLevel.World;
                     }
 
-                    for (Park park : allParks) {
-                        City city = park.getCity();
-                        if (geoLevel == GeoLevel.World || cityIdMap.containsKey(city.getCityId())) {
-                            cities.add(city);
-                            // TODO Only countries matching the continent should be shown
-                            countries.add(city.getCountry2letter());
-                        }
+                    for (City city : cityIdMap.values()) {
+                        cities.add(city);
+                        countries.add(city.getCountry2letter());
                     }
                 }
                 // TODO Continents should be derived from the country, but we do not have a
@@ -309,5 +267,22 @@ public class ParksFragment extends Fragment {
         boolean precisionIsAtLeast(GeoLevel minimumLevel) {
             return this.level >= minimumLevel.level;
         }
+    }
+
+    private abstract class GeoSpinnerOnItemSelectedListener<T> implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public final void onItemSelected(AdapterView adapterView, View view, int pos, long id) {
+            String newValue = (String) adapterView.getItemAtPosition(pos);
+            boolean all = SPINNER_DEFAULT_ALL.equals(newValue);
+            set(all ? null : newValue);
+        }
+
+        @Override
+        public final void onNothingSelected(AdapterView<?> adapterView) {
+            set(null);
+        }
+
+        abstract void set(String newValue);
     }
 }
