@@ -5,10 +5,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import org.riderun.app.model.Count;
+import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Ride;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,22 +29,23 @@ public class CountDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         String msg = ride.name() + " (" + ride.rcdbId() + ") ";
-        LocalDate countDate = ride.getCountDate();
-        if (countDate == null) {
-            msg += " is not counted yet. Confirm with OK to mark the count.";
+        final  Count count = ride.getCount();
+        final boolean actionIsRemove = !count.isEmpty();
+        if (actionIsRemove) {
+            CountEntry lastEntry = count.getLastEntry();
+            msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
          } else {
-            msg += " is already counted. Confirm with OK to remove the count.";
+            msg += " is not counted yet. Confirm with OK to mark the count.";
         }
 
         builder.setTitle("Count Ride").setMessage(msg);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                LocalDate countDate = ride.getCountDate();
-                if (countDate == null) {
-                    ride.setCountDate(LocalDateTime.now());
+                if (actionIsRemove) {
+                    count.removeCount(count.getLastEntry());
                 } else {
-                    ride.setCountDate(null);
+                    count.addCountNow();
                 }
                 ridesViewModel.notifyFieldModification();
             }

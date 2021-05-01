@@ -1,8 +1,5 @@
 package org.riderun.app.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 public class Ride {
     private final String name;
     private final Park park;
@@ -36,11 +33,7 @@ public class Ride {
      * Returns the count date (first ride). Only the date portion is returned (w/o time)
      * @return The date of the first ride, null if not ridden yet
      */
-    public LocalDate getCountDate() {
-        return count.getCountDate();
-    }
-
-    public void setCountDate(LocalDateTime countDateTime) {
-        count.setCountDate(countDateTime);
+    public Count getCount() {
+        return count;
     }
 }

@@ -7,6 +7,7 @@ import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ride.RidesProvider;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,10 @@ public class RidesMockedProvider implements RidesProvider {
     }
 
     private static Count ld(int year) {
-        return new Count(LocalDate.of(year,9, 16).atStartOfDay());
+        Count count = new Count();
+        ZoneId zo = ZoneId.of("EET");
+        count.addCount(LocalDate.of(year,9, 16).atStartOfDay().atZone(zo).toInstant(), zo);
+        return count;
     }
 
     public List<Ride> rides() {

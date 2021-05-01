@@ -1,9 +1,11 @@
 package org.riderun.app.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeSet;
 
 /**
  *  The count for one Ride. In other words, the user-specific data for a ride. At the moment
@@ -16,38 +18,52 @@ import java.util.List;
  *  we never pass around Count instances w/o Ride.
  */
 public class Count {
-    private volatile LocalDateTime countDate;
-    private final List<LocalDateTime> repeats = new ArrayList<>(0);
+    private final SortedSet<CountEntry> counts = new TreeSet<>();
 
     public Count() {
-        this(null);
     }
 
-    public Count(LocalDateTime countDate) {
-        this.countDate = countDate;
+    public boolean isEmpty() {
+        return counts.isEmpty();
     }
 
     /**
      * Returns the count date (first ride). Only the date portion is returned (w/o time)
      * @return The date of the first ride, null if not ridden yet
      */
-    public LocalDate getCountDate() {
-        return countDate == null ? null : countDate.toLocalDate();
+    public CountEntry getFirstEntry() {
+        return counts.isEmpty()  ? null : counts.first();
     }
 
     /**
-     * Sets the date and time of the first ride. null to "uncount"/reset.
-     * @param countDate count date, may be null
+     * Returns the last/newest count count date (last ride).
+     * @return The date of the first ride, null if not ridden yet
      */
-    public void setCountDate(LocalDateTime countDate) {
-        this.countDate = countDate;
+    public CountEntry getLastEntry() {
+        return counts.isEmpty()  ? null : counts.last();
+    }
+
+    public Iterator<CountEntry> iterator() {
+        return counts.iterator();
     }
 
     /**
-     * Returns the list of ride repeats
-     * @return
+     * Adds a count. using the current time and the users default time zone
      */
-    public List<LocalDateTime> getRepeats() {
-        return repeats;
+    public void addCountNow() {
+        counts.add(new CountEntry(Instant.now(), TimeZone.getDefault().getID()));
     }
+
+    public void addCount(Instant instant, ZoneId zoneId) {
+        counts.add(new CountEntry(instant, zoneId.getId()));
+    }
+
+    public void addCount(Instant instant, String timezone) {
+        counts.add(new CountEntry(instant, timezone));
+    }
+
+    public void removeCount(CountEntry countEntry) {
+        counts.remove(countEntry);
+    }
+
 }

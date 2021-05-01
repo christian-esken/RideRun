@@ -1,5 +1,6 @@
 package org.riderun.app.provider.city.country;
 
+import org.riderun.app.model.Continent;
 import org.riderun.app.model.Country;
 
 import java.util.List;
@@ -13,5 +14,7 @@ public interface CountryProvider {
      * @param cc The 2 letter country code
      * @return The matching country. null if no such country exists
      */
-    public Country by2letterCC(String cc);
+    Country by2letterCC(String cc);
+
+    List<Continent> continents();
 }

@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.riderun.app.R;
+import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
 
@@ -52,7 +53,7 @@ public class RidesFragment extends Fragment {
                 if (rides.isEmpty()) {
                     counts.setText("-");
                 } else {
-                    long counted = rides.stream().filter(i -> i.getCountDate() != null).count();
+                    long counted = rides.stream().filter(i -> !i.getCount().isEmpty()).count();
                     counts.setText(counted + "/" + rides.size());
                 }
 
@@ -72,9 +73,9 @@ public class RidesFragment extends Fragment {
                     TableRow tr = new TableRow(ctx);
                     tr.setBackgroundColor(Color.WHITE);
 
-                    LocalDate countDate = ride.getCountDate();
+                    CountEntry ceFirst = ride.getCount().getFirstEntry();
                     final Button countButton;
-                    if (countDate == null) {
+                    if (ceFirst == null) {
                         Button button = new Button(ctx);
                         button.setText("Count");
                         //button.setBackgroundColor(Color.YELLOW);
@@ -83,7 +84,7 @@ public class RidesFragment extends Fragment {
                     } else {
                         // Clicking the button means: Edit or add a repeated ride
                         Button button = new Button(ctx);
-                        button.setText(countDate.toString());
+                        button.setText(ceFirst.formatAsDateTime());
                         //button.setBackgroundColor(Color.LTGRAY);
                         countButton = button;
                     }
