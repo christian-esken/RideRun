@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
@@ -128,9 +128,9 @@ public class ParksFragment extends Fragment {
 
                 // Preselection specific filter criteria: Location (continent, country, city)
                 List<Park> allParks = parksProvider.all();
-                Set<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
-                Set<String> countries = new TreeSet<>();
-                Set<String> continents = new TreeSet<>();
+                SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
+                SortedSet<String> countries = new TreeSet<>();
+                SortedSet<String> continents = new TreeSet<>();
 
                 GeoLevel geoLevel = null;
                 {   // Opening a block solely to limit variable scope
@@ -174,31 +174,9 @@ public class ParksFragment extends Fragment {
                 continents.add("Australia");
                 continents.add("Europe");
 
-                ArrayList<String> alContinent = new ArrayList<>(continents.size()+1);
-                alContinent.add(SPINNER_DEFAULT_ALL);
-                continents.forEach(continent -> alContinent.add(continent));
-                ArrayAdapter<String> aaContinent = new ArrayAdapter<>(spinnerContinent.getContext(), android.R.layout.simple_list_item_1, alContinent);
-                spinnerContinent.setAdapter(aaContinent);
-                spinnerContinent.setSelection(0);
-
-                ArrayList<String> alCountries = new ArrayList<>(countries.size()+1);
-                alCountries.add(SPINNER_DEFAULT_ALL);
-                countries.forEach(country -> alCountries.add(country));
-                ArrayAdapter<String> aaCountries = new ArrayAdapter<>(spinnerCountry.getContext(), android.R.layout.simple_list_item_1, alCountries);
-                spinnerCountry.setAdapter(aaCountries);
-                setSpinnerSelection(spinnerCountry, alCountries, filterCriteria.locationCountryCode2letter);
-
-
-                ArrayList<String> alCities = new ArrayList<>(cities.size()+1);
-                alCities.add(SPINNER_DEFAULT_ALL);
-                if (geoLevel.precisionIsAtLeast(GeoLevel.Country)) {
-                    cities.forEach(city -> alCities.add(city.getName()));
-                } else {
-                    // World: Show all cities
-                    cityProvider.cities().forEach(city -> alCities.add(city.getName()));
-                }
-                ArrayAdapter<String> aaCity = new ArrayAdapter<>(spinnerCity.getContext(), android.R.layout.simple_list_item_1, alCities);
-                spinnerCity.setAdapter(aaCity);
+                updateSpinnerAdapter(spinnerContinent, continents, filterCriteria.locationContinent);
+                updateSpinnerAdapter(spinnerCountry, countries, filterCriteria.locationCountryCode2letter);
+                updateSpinnerAdapter(spinnerCity, cities, filterCriteria.locationCityId);
 
                 // Park table
                 Context pctx = parksTable.getContext();
@@ -238,15 +216,35 @@ public class ParksFragment extends Fragment {
     }
 
     /**
+     * Updates a Spinner with new entries from the given Set. The Spinner selection is set to
+     * the entry from entries that matches the selection. Formally entry.equals(selection).
+     * <br>
+     *     Note: As this method replaces the ArrayAdapter of the Spinner, update methods may
+     *      get triggered.
+     *
+     * @param spinner
+     * @param entries
+     * @param selection
+     */
+    private void updateSpinnerAdapter(Spinner spinner, SortedSet<?> entries, Object selection) {
+        ArrayList al = new ArrayList(entries.size()+1);
+        al.add(SPINNER_DEFAULT_ALL);
+        entries.forEach(entry -> al.add(entry));
+        ArrayAdapter<String> aaContinent = new ArrayAdapter<>(spinner.getContext(), android.R.layout.simple_list_item_1, al);
+        spinner.setAdapter(aaContinent);
+        setSpinnerSelection(spinner, al, selection, 0);
+    }
+
+    /**
      * Set selection on the spinner element that matches the given String. Hint: The spinnerArray
      * should be the same ArrayList that is used for the Adapter.
      * @param spinner
      * @param spinnerArray
      * @param match
      */
-    private void setSpinnerSelection(Spinner spinner, ArrayList<String> spinnerArray, String match) {
+    private void setSpinnerSelection(Spinner spinner, ArrayList<String> spinnerArray, Object match, int fallbackId) {
         int i = 0;
-        for (String s : spinnerArray) {
+        for (Object s : spinnerArray) {
             if (s.equals(match)) {
                 spinner.setSelection(i);
                 return;
@@ -269,7 +267,12 @@ public class ParksFragment extends Fragment {
         }
     }
 
-    private abstract class GeoSpinnerOnItemSelectedListener<T> implements AdapterView.OnItemSelectedListener {
+    /**
+     * An abstract OnItemSelectedListener implementation that unifies onItemSelected() and
+     * onNothingSelected() behaviour. Both call {@link #set(String)}, either with null or the
+     * item at spinner position #pos.
+     */
+    private abstract class GeoSpinnerOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         @Override
         public final void onItemSelected(AdapterView adapterView, View view, int pos, long id) {
