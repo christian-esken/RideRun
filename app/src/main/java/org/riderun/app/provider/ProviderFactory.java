@@ -2,6 +2,7 @@ package org.riderun.app.provider;
 
 import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.city.mock.CityMockProvider;
+import org.riderun.app.provider.city.rcdb.CityRCDBProvider;
 import org.riderun.app.provider.count.CountProvider;
 import org.riderun.app.provider.count.db.RcdbCountProvider;
 import org.riderun.app.provider.park.ParksProvider;
@@ -23,7 +24,7 @@ public class ProviderFactory {
 
 
     public static CityProvider cityProvider() {
-        return MOCK ? CityMockProvider.instance() : CityMockProvider.instance(); // TODO Real provider
+        return MOCK ? CityMockProvider.instance() : CityRCDBProvider.instance();
     }
 
     public static CountProvider countProvider() {

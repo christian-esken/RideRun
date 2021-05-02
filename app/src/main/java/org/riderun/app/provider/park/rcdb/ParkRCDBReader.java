@@ -12,13 +12,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ParkRCDBReader {
     private static ParkRCDBReader instance = new ParkRCDBReader();
 
 
     private ArrayList<Park> PARKS = new ArrayList<>();
+    private Set<Integer> CITY_IDS = new HashSet<>();
+    private Set<Integer> COUNTRY_IDS = new HashSet<>();
+    private Map<Integer, Integer> CITY2COUNTRY = new HashMap<>();
 
     public static ParkRCDBReader instance() {
         return instance;
@@ -26,7 +33,6 @@ public class ParkRCDBReader {
 
     // private. Use  ParkMock.instance() instead
     private ParkRCDBReader() {
-        CityProvider cityProvider = CityMockProvider.instance();
         InputStream is = RideRunApplication.getAppContext().getResources().openRawResource(R.raw.rcdb_parks_europe);
         BufferedReader br = new BufferedReader(new InputStreamReader(is, Charset.forName("utf-8")));
         try {
@@ -48,13 +54,17 @@ public class ParkRCDBReader {
                 String[] locations = locationIds.split(",");
                 int cityId = locations.length > 0 ? Integer.parseInt(locations[0]) : -1;
                 int countryId = locations.length > 1 ? Integer.parseInt(locations[locations.length-1]) : -1;
-
-                City city = cityProvider.byCityId(cityId, true);
-
+                if (cityId != -1) {
+                    CITY_IDS.add(cityId);
+                    if (countryId != -1) {
+                        COUNTRY_IDS.add(countryId);
+                        CITY2COUNTRY.put(cityId, countryId);
+                    }
+                }
                 PARKS.add(new Park(
                         parkName, // parkName
                         rcdbParkId,
-                        city
+                        cityId
                 ));
             }
         } catch (Exception exc) {
@@ -78,6 +88,25 @@ public class ParkRCDBReader {
     // Test method: Return the first "count" Parks
     public List<Park> parks(int count) {
         return PARKS.subList(0, count);
+    }
+
+    // Remove this method. Possible fix is a clean data import of the actual location hierarchy
+    // in CityRCDBReader. Then we don't need to guess any longer via the parks data.
+    public boolean parkInCityExists(int cityId) {
+        return CITY_IDS.contains(cityId);
+    }
+
+    // Remove this method. Possible fix is a clean data import of the actual location hierarchy
+    // in CityRCDBReader. Then we don't need to guess any longer via the parks data.
+    public boolean parkInCountryExists(int cityId) {
+        return COUNTRY_IDS.contains(cityId);
+    }
+
+    public Integer city2country(Integer cityid) {
+        if (cityid == null) {
+            return null;
+        }
+        return CITY2COUNTRY.get(cityid);
     }
 
 }

@@ -18,8 +18,8 @@ public class RidesMockedProvider implements RidesProvider {
 
     private RidesMockedProvider() {
         // TODO Replace this City and Park by using a city from CityMock / ParkMock
-        City city = new City("Brühl", 1, 25873, "DE", 50.833333, 6.9);
-        Park park = new Park("Phantasialand", 4872, city, 50.833333, 6.9);
+        //City city = new City("Brühl", 1, 25873, "DE", 50.833333, 6.9);
+        Park park = new Park("Phantasialand", 4872, 25873, 50.833333, 6.9);
 
         // TODO Replace this by a new RideMock, similar to ParkMock and CityMock
         RIDES.add(new Ride("Taron", park, 12723));

@@ -3,24 +3,24 @@ package org.riderun.app.model;
 public class Park {
     private final String name;
     private final int rcdbId;
-    private final City city;
+    private final Integer cityId;
     private GeoCoordinate geoCoordinate;
     // description
     // image
     // location / how to find
     // Adress
 
-    public Park(String name, int rcdbId, City city, double longitude, double latitude) {
+    public Park(String name, int rcdbId, Integer cityId, double longitude, double latitude) {
         this.name = name;
         this.rcdbId = rcdbId;
-        this.city = city;
+        this.cityId = cityId;
         this.geoCoordinate = new GeoCoordinate(latitude, longitude, GeoPrecision.Park);
     }
 
-    public Park(String name, int rcdbId, City city) {
+    public Park(String name, int rcdbId, Integer cityId) {
         this.name = name;
         this.rcdbId = rcdbId;
-        this.city = city;
+        this.cityId = cityId;
         this.geoCoordinate = GeoCoordinate.empty();
     }
 
@@ -32,11 +32,13 @@ public class Park {
         return rcdbId;
     }
 
-    public City getCity() {
-        return city;
+    public Integer getCityId() {
+        return cityId;
     }
 
     public GeoCoordinate getGeoCoordinate() {
-        return geoCoordinate.isEmpty() ? city.getGeoCoordinate() : geoCoordinate;
+        return GeoCoordinate.empty();
+        // TODO Move getGeoCoordinate to a helper method that goes through the geo hierarchy.
+        //  -> geoCoordinate.isEmpty() ? city.getGeoCoordinate() : geoCoordinate;
     }
 }

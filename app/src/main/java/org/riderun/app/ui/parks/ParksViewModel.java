@@ -1,8 +1,10 @@
 package org.riderun.app.ui.parks;
 
+import org.riderun.app.model.City;
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
 import org.riderun.app.provider.ProviderFactory;
+import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.config.ConfigDefaultsProvider;
 import org.riderun.app.provider.config.ConfigProvider;
 import org.riderun.app.provider.park.ParksProvider;
@@ -21,10 +23,12 @@ public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
     private MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
     private ParksProvider parksProvider;
+    private final CityProvider cityProvider;
 
     public ParksViewModel() {
         // Set providers
         parksProvider = ProviderFactory.parksProvider();
+        cityProvider = ProviderFactory.cityProvider();
 
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
@@ -67,7 +71,9 @@ public class ParksViewModel extends ViewModel {
                 List<Park> parks = parkprovider.all();
                 if (cc != null) {
                     for (Park park : parks) {
-                        if (cc.equals(park.getCity().getCountry2letter())) {
+                        // TODO Check if assignUnknownCityIfNotFound should be true or false here
+                        City city = cityProvider.byCityId(park.getCityId(), true);
+                        if (cc.equals(city.getCountry2letter())) {
                             parkList.add(park);
                         }
                     }

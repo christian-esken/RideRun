@@ -35,12 +35,11 @@ public class ParkMockReader {
                 String[] fields = line.split(";");
 
                 int cityId = Integer.parseInt(fields[2]);
-                City city = cityMock.byCityId(cityId, true);
 
                 PARKS.add(new Park(
                         fields[0],
                         Integer.parseInt(fields[1]),
-                        city
+                        cityId
                 ));
             }
         } catch (Exception exc) {

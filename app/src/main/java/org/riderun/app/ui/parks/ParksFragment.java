@@ -195,7 +195,7 @@ public class ParksFragment extends Fragment {
                         TextView parkName = new TextView(ctx);
                         parkName.setText(park.getName());
                         TextView cityName = new TextView(ctx);
-                        City city = park.getCity();
+                        City city = cityProvider.byCityId(park.getCityId(), true);
                         cityName.setText(city.getName() + " (" + city.getCountry2letter() + ")");
 
                         TextView geoView = new TextView(ctx);

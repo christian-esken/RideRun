@@ -14,7 +14,7 @@ import java.util.List;
 
 public class CityMockProvider implements CityProvider {
     private static final CityMockProvider instance = new CityMockProvider();
-    private static final City UNKNOWN_CITY = new City("Unknown city", 0 , 0, "--");
+    private static final City UNKNOWN_CITY = new City("Unknown city", -1 , -1, "--");
 
     private final ArrayList<City> CITIES = new ArrayList<>();
 
