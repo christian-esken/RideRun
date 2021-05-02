@@ -11,10 +11,12 @@ import java.util.TimeZone;
 public class CountEntry implements Comparable<CountEntry> {
     final Instant instant;
     final String timezone;
+    final String comment;
 
-    public CountEntry(Instant instant, String timezone) {
+    public CountEntry(Instant instant, String timezone, String comment) {
         this.instant = instant;
         this.timezone = timezone;
+        this.comment = comment;
     }
 
     public String formatAsDate() {
@@ -62,5 +64,13 @@ public class CountEntry implements Comparable<CountEntry> {
 
     public String visitedTimezoneString() {
         return timezone;
+    }
+
+    /**
+     * Returns the user comment on this Count. null if there is no user comment
+     * @return User comment. May be null
+     */
+    public String comment() {
+        return comment;
     }
 }
