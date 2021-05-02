@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
 import org.riderun.app.RideRunApplication;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.CountEntry;
@@ -27,8 +28,9 @@ public class SQLiteStorage extends SQLiteOpenHelper {
 
     // Standard column names
     public static final String C_ID = "id";      // Numeric ID
-    public static final String C_UUID = "uuid";  // UUID in String format "6fc6cb12-9031-4499-9578-d39d218d6ceb"
+    //public static final String C_UUID = "uuid";  // UUID in String format "6fc6cb12-9031-4499-9578-d39d218d6ceb"
     public static final String C_PROVIDER = "provider"; // Provider ID String ("countdb", "rcdb")
+    public static final String C_COMMENT = "comment";   // Free form user comment
 
 
     // counts
@@ -39,6 +41,15 @@ public class SQLiteStorage extends SQLiteOpenHelper {
 
     // metadata
     private static final String T_METADATA = "metadata";
+
+    // SQL templates
+    public static final String SELECT_COUNTS_SQL = "SELECT "
+            + C_PROVIDER
+            + "," + C_POI
+            + "," + C_VISITED_AT
+            + "," + C_VISITED_TIMEZONE
+            + "," + C_COMMENT
+            + " FROM " + T_COUNTS;
 
 
     private SQLiteStorage(@Nullable Context context) {
@@ -68,7 +79,7 @@ public class SQLiteStorage extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createIdeas = "CREATE TABLE " +  T_COUNTS + " ("
+        String createCounts = "CREATE TABLE " +  T_COUNTS + " ("
                 // The ID is supposed to not get exported or visible on a Web page. It is user
                 // specific. And it is  a purely technical measure to have a unique key, that
                 // can be updated. It may also change, e.g. on an "undo" operation the id will
@@ -86,11 +97,17 @@ public class SQLiteStorage extends SQLiteOpenHelper {
                 // The time zone of the visit. We need to store it, as users that go abroad may
                 // be temporarily change te time zone. The counts should be shown with
                 // the correct time
-                + C_VISITED_TIMEZONE + " STRING "
+                + C_VISITED_TIMEZONE + " TEXT, "
+                // A free comment, e.g. "Virtual tour" or "Without museum visit"
+                + C_COMMENT + " TEXT "
                 + ")";
+
+        // Index for  getBy... Provider,Poi
+        String indexCounts = "CREATE INDEX idx_provider_poi ON " + T_COUNTS + " (" + C_PROVIDER + "," + C_POI + ")";
         String createMeta  = "CREATE TABLE " +  T_METADATA + " (k TEXT PRIMARY KEY, value TEXT)";
 
-        db.execSQL(createIdeas);
+        db.execSQL(createCounts);
+        db.execSQL(indexCounts);
         db.execSQL(createMeta);
     }
 
@@ -99,16 +116,23 @@ public class SQLiteStorage extends SQLiteOpenHelper {
 
     }
 
+    // --- READ FROM DB --------------------------------
 
     public Map<PoiKey, Count> getAll() {
-        String sql = "SELECT "
-                + C_PROVIDER
-                + ","+ C_POI
-                + "," + C_VISITED_AT
-                + "," + C_VISITED_TIMEZONE
-                + " FROM " + T_COUNTS;
+        return getCountsFromDbQuery(SELECT_COUNTS_SQL);
+    }
 
-        try (SQLiteDatabase db = getReadableDatabase();  Cursor cursor = db.rawQuery(sql, null);) {
+    public Map<PoiKey, Count> getByPoiKey(PoiKey poiKey) {
+        String sql = SELECT_COUNTS_SQL
+                + " WHERE " + C_PROVIDER + " = '" + poiKey.provider + "' AND "
+                + C_POI + " = '" + poiKey.poi + "'";
+
+        return getCountsFromDbQuery(sql);
+    }
+
+    @NotNull
+    private Map<PoiKey, Count> getCountsFromDbQuery(String sql) {
+        try (SQLiteDatabase db = getReadableDatabase(); Cursor cursor = db.rawQuery(sql, null)) {
             Map<PoiKey, Count> countMap = new HashMap<>();
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -116,8 +140,9 @@ public class SQLiteStorage extends SQLiteOpenHelper {
                 String poi = cursor.getString(1);
                 int visitedAtEpcoh = cursor.getInt(2);
                 String visitedTz = cursor.getString(3);
+                String comment = cursor.getString(4);
                 PoiKey pk = new PoiKey(provider, poi);
-                countMap.computeIfAbsent(pk, foo -> new Count()).addCount(Instant.ofEpochSecond(visitedAtEpcoh), visitedTz);
+                countMap.computeIfAbsent(pk, foo -> new Count()).addCount(Instant.ofEpochSecond(visitedAtEpcoh), visitedTz, comment);
                 cursor.moveToNext();
             }
             cursor.close();
@@ -125,16 +150,18 @@ public class SQLiteStorage extends SQLiteOpenHelper {
         }
     }
 
+    // --- WRITE TO DB --------------------------------
+
     /**
      * Writes  the counts fot the given POI. If counts for the POI existed, they will be replaced.
      * @param poiKey The POI
      * @param counts The (new) counts
      */
     public void replaceCount(PoiKey poiKey, Count counts) {
-        try(SQLiteDatabase db = getWritableDatabase();) {
+        try(SQLiteDatabase db = getWritableDatabase()) {
             // Remove old counts
-            String sqlDeleteWhere = C_PROVIDER + " = '?' AND " + C_POI + " = '?' ";
-            int deletedRows = db.delete(T_COUNTS, sqlDeleteWhere, new String[]{poiKey.provider, poiKey.poi});
+            String sqlDeleteWhere = C_PROVIDER + " = ? AND " + C_POI + " = ? ";
+            db.delete(T_COUNTS, sqlDeleteWhere, new String[]{poiKey.provider, poiKey.poi});
 
             // Add new counts
             Iterator<CountEntry> iterator = counts.iterator();
@@ -146,7 +173,8 @@ public class SQLiteStorage extends SQLiteOpenHelper {
                 cv.put(C_POI, poiKey.poi);
                 cv.put(C_VISITED_AT, ce.visitedAsEpochSeconds());
                 cv.put(C_VISITED_TIMEZONE, ce.visitedTimezoneString());
-                long rowId = db.insert(T_COUNTS, null, cv);
+                cv.put(C_COMMENT, ce.comment());
+                db.insert(T_COUNTS, null, cv);
             }
         }
     }

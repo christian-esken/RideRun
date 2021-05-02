@@ -276,7 +276,15 @@ public class ParksFragment extends Fragment {
 
         @Override
         public final void onItemSelected(AdapterView adapterView, View view, int pos, long id) {
-            String newValue = (String) adapterView.getItemAtPosition(pos);
+            Object item = adapterView.getItemAtPosition(pos);
+            final String newValue;
+            if (item instanceof String) {
+                newValue = (String)item;
+            } else if (item instanceof City) {
+                newValue = ((City)item).getName();
+            } else {
+                newValue = item.toString();
+            }
             boolean all = SPINNER_DEFAULT_ALL.equals(newValue);
             set(all ? null : newValue);
         }

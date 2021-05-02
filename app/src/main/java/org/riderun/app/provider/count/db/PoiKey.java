@@ -5,8 +5,8 @@ package org.riderun.app.provider.count.db;
  * in the namespace.
  */
 public class PoiKey {
-    final String provider;
-    final String poi;
+    public final String provider;
+    public final String poi;
 
     public PoiKey(String provider, String poi) {
         this.provider = provider;
