@@ -50,16 +50,16 @@ public class Count {
     /**
      * Adds a count. using the current time and the users default time zone
      */
-    public void addCountNow() {
-        counts.add(new CountEntry(Instant.now(), TimeZone.getDefault().getID()));
+    public void addCountNow(String comment) {
+        counts.add(new CountEntry(Instant.now(), TimeZone.getDefault().getID(), comment));
     }
 
-    public void addCount(Instant instant, ZoneId zoneId) {
-        counts.add(new CountEntry(instant, zoneId.getId()));
+    public void addCount(Instant instant, ZoneId zoneId, String comment) {
+        counts.add(new CountEntry(instant, zoneId.getId(), comment));
     }
 
-    public void addCount(Instant instant, String timezone) {
-        counts.add(new CountEntry(instant, timezone));
+    public void addCount(Instant instant, String timezone, String comment) {
+        counts.add(new CountEntry(instant, timezone, comment));
     }
 
     public void removeCount(CountEntry countEntry) {
