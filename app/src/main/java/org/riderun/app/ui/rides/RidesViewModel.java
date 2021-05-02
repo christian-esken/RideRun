@@ -3,9 +3,12 @@ package org.riderun.app.ui.rides;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
+import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.count.CountProvider;
 import org.riderun.app.provider.count.db.PoiKey;
 import org.riderun.app.provider.count.db.RcdbCountProvider;
+import org.riderun.app.provider.park.ParksProvider;
+import org.riderun.app.provider.ride.RidesProvider;
 import org.riderun.app.provider.ride.mock.RidesMockedProvider;
 import org.riderun.app.provider.park.mock.ParkMockReader;
 
@@ -24,15 +27,16 @@ import androidx.lifecycle.ViewModel;
 public class RidesViewModel extends ViewModel {
     private final MutableLiveData<RidesData> data = new MutableLiveData<>();
     // The following fields are used to update
-    CountProvider countProvider = new RcdbCountProvider();
-    ParkMockReader parks = ParkMockReader.instance();
+    CountProvider countProvider = ProviderFactory.countProvider();
+    ParksProvider parks = ProviderFactory.parksProvider();
+    RidesProvider ridesProvider = ProviderFactory.ridesProvider();
     List<Ride> rides;
     //Map<PoiKey, Count> counts;
 
     public RidesViewModel() {
-        Park park = parks.parks().get(0);
-        rides = RidesMockedProvider.instance().rides();
-        RidesData rdata = new RidesData(park, rides, rebuildCounts());
+        Park park = parks.all().get(0);
+        rides = ridesProvider.rides();
+        RidesData rdata = new RidesData(park, rides, reloadCounts());
         data.setValue(rdata);
     }
 
@@ -47,7 +51,7 @@ public class RidesViewModel extends ViewModel {
     }
 
 
-    private Map<PoiKey, Count> rebuildCounts() {
+    private Map<PoiKey, Count> reloadCounts() {
         Map<PoiKey, Count> counts = new HashMap<>();
         for (Ride ride : rides) {
             counts.putAll(countProvider.getByPoiKey(Integer.toString(ride.rcdbId())));
@@ -75,6 +79,6 @@ public class RidesViewModel extends ViewModel {
         // as counts for ALL rides of this Model are reloaded. Usually this is only a dozend or less,
         // but if the user would be able to show all rides (10000 in the whole world), this would be
         // not so efficient. For now we don't do this premature optimization.
-        data.postValue(new RidesData(existingValue.park, existingValue.rides, rebuildCounts()));
+        data.postValue(new RidesData(existingValue.park, existingValue.rides, reloadCounts()));
     }
 }

@@ -2,9 +2,10 @@ package org.riderun.app.ui.parks;
 
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
+import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.config.ConfigDefaultsProvider;
 import org.riderun.app.provider.config.ConfigProvider;
-import org.riderun.app.provider.park.mock.ParkMockReader;
+import org.riderun.app.provider.park.ParksProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +20,11 @@ import androidx.lifecycle.ViewModel;
 public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
     private MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
-    private ParkMockReader parkProvider;
+    private ParksProvider parksProvider;
 
     public ParksViewModel() {
         // Set providers
-        parkProvider = ParkMockReader.instance();
+        parksProvider = ProviderFactory.parksProvider();
 
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
@@ -31,7 +32,7 @@ public class ParksViewModel extends ViewModel {
                 .preselection(config.parkPreselection())
                 .geoCoordinate(config.geoCoordinate())
                 .limit(config.parkLimit()).build();
-        ParksData appliedFilter = applyFilter(filterCriteria, parkProvider);
+        ParksData appliedFilter = applyFilter(filterCriteria, parksProvider);
         liveParksData.setValue(appliedFilter);
     }
 
@@ -45,7 +46,7 @@ public class ParksViewModel extends ViewModel {
      *                     limited list, e.g. the parks from aq given Country of Tour.
      * @return The matching, filtered and sorted Parks
      */
-    private ParksData applyFilter(ParksFilterCriteria criteria, ParkMockReader parkprovider) {
+    private ParksData applyFilter(ParksFilterCriteria criteria, ParksProvider parkprovider) {
         String nameFilter = criteria.nameFilter.toLowerCase();
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
         boolean hasFilter = hasNameFilter; // currently there is only one filter
@@ -58,12 +59,12 @@ public class ParksViewModel extends ViewModel {
         final List<Park> parkList;
         switch (criteria.preselection) {
             case All:
-                parkList = parkprovider.parks();
+                parkList = parkprovider.all();
                 break;
             case Location:
                 parkList = new ArrayList<>();
                 String cc = criteria.locationCountryCode2letter;
-                List<Park> parks = parkprovider.parks();
+                List<Park> parks = parkprovider.all();
                 if (cc != null) {
                     for (Park park : parks) {
                         if (cc.equals(park.getCity().getCountry2letter())) {
@@ -81,7 +82,7 @@ public class ParksViewModel extends ViewModel {
                 throw new UnsupportedOperationException("Nearby not yet implemented");
             default:
                 // TODO Log warning
-                parkList = parkprovider.parks();
+                parkList = parkprovider.all();
                 break;
         }
         List<Park> parksMatching = new ArrayList<>(parkList.size());
@@ -153,7 +154,7 @@ public class ParksViewModel extends ViewModel {
             //  -> liveParksData.postValue(parksData)
             //  -> ParksFragment (see TextWatcher)
             //  ...
-            ParksData parksData = applyFilter(fcNew, parkProvider);
+            ParksData parksData = applyFilter(fcNew, parksProvider);
             liveParksData.postValue(parksData);
         }
     }

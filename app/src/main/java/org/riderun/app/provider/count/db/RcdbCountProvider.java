@@ -7,7 +7,21 @@ import org.riderun.app.provider.count.CountProvider;
 import java.util.Map;
 
 public class RcdbCountProvider implements CountProvider {
+    private static RcdbCountProvider instance;
+
     private final SQLiteStorage sqLiteStorage;
+
+    private RcdbCountProvider() {
+        this.sqLiteStorage = SQLiteStorage.build();
+    }
+
+    public static synchronized RcdbCountProvider instance() {
+        if (instance == null) {
+            instance = new RcdbCountProvider();
+        }
+        return instance;
+    }
+
 
     @Override
     public String id() {
@@ -23,10 +37,6 @@ public class RcdbCountProvider implements CountProvider {
     @Override
     public ProviderType type() {
         return ProviderType.Count;
-    }
-
-    public RcdbCountProvider() {
-        this.sqLiteStorage = SQLiteStorage.build();
     }
 
     @Override

@@ -21,10 +21,9 @@ import org.riderun.app.R;
 import org.riderun.app.model.City;
 import org.riderun.app.model.GeoPrecision;
 import org.riderun.app.model.Park;
+import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
-import org.riderun.app.provider.city.mock.CityMockProvider;
 import org.riderun.app.provider.park.ParksProvider;
-import org.riderun.app.provider.park.mock.ParksMockProvider;
 import org.riderun.app.storage.Order;
 
 import java.util.ArrayList;
@@ -57,8 +56,9 @@ public class ParksFragment extends Fragment {
     // view model.
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        parksProvider = ParksMockProvider.instance();
-        cityProvider = CityMockProvider.instance();
+
+        parksProvider = ProviderFactory.parksProvider();
+        cityProvider = ProviderFactory.cityProvider();
 
         ParksViewModel parksViewModel = new ViewModelProvider(this).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);

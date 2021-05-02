@@ -25,6 +25,13 @@ public class City {
         this.geoCoordinate = new GeoCoordinate(latitude, longitude, GeoPrecision.City);
     }
 
+    /**
+     * Create a new city without geo position
+     * @param name
+     * @param cityId
+     * @param rcdbId
+     * @param country2letter
+     */
     public City(String name, int cityId, int rcdbId, String country2letter) {
         this.name = name;
         this.cityId = cityId;

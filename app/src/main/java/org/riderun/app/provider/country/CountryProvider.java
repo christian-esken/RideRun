@@ -1,4 +1,4 @@
-package org.riderun.app.provider.city.country;
+package org.riderun.app.provider.country;
 
 import org.riderun.app.model.Continent;
 import org.riderun.app.model.Country;
