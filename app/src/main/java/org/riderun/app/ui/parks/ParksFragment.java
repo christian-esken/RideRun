@@ -20,10 +20,12 @@ import com.google.android.material.chip.Chip;
 import org.riderun.app.R;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Continent;
+import org.riderun.app.model.Country;
 import org.riderun.app.model.GeoPrecision;
 import org.riderun.app.model.Park;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.country.CountryProvider;
 import org.riderun.app.provider.park.ParksProvider;
 import org.riderun.app.storage.Order;
 
@@ -53,6 +55,7 @@ public class ParksFragment extends Fragment {
     static final String SPINNER_DEFAULT_ALL = "All";
     ParksProvider parksProvider;
     CityProvider cityProvider;
+    CountryProvider countryProvider;
 
     // Note onCreateView looks up the UI elements, install listeners and starts observing the
     // view model.
@@ -61,6 +64,7 @@ public class ParksFragment extends Fragment {
 
         parksProvider = ProviderFactory.parksProvider();
         cityProvider = ProviderFactory.cityProvider();
+        countryProvider = ProviderFactory.countryProvider();
 
         ParksViewModel parksViewModel = new ViewModelProvider(this).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
@@ -94,21 +98,21 @@ public class ParksFragment extends Fragment {
         });
 
         spinnerContinent.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
-            void set(String newValue) { parksViewModel.setLocationContinent(newValue); }
+            void set(Object newValue) { parksViewModel.setLocationContinent((String)newValue); }
         });
 
         spinnerCountry.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
-            void set(String newValue) { parksViewModel.setLocationCountry(newValue); }
+            void set(Object newValue) { parksViewModel.setLocationCountry((String)newValue); }
         });
 
         spinnerCity.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
-            void set(String newValue) {
-                List<City> cities = newValue == null ? Collections.emptyList() : cityProvider.byCityName(newValue);
-
-                // TODO If there are two cities with the same name, we will just pick the
-                // first one. The fix for this will be to upgrade the Adapter from String to City.
-                Integer cityId = cities.isEmpty() ? null : cities.get(0).getCityId();
-                parksViewModel.setLocationCityId(cityId);
+            void set(Object newValue) {
+                if (newValue == null || newValue instanceof String) {
+                    // SHOULD be the "ALL" selection
+                    parksViewModel.setLocationCityId(null);
+                } else {
+                    parksViewModel.setLocationCityId(((City)newValue).getCityId());
+                }
             }
         });
 
@@ -131,7 +135,10 @@ public class ParksFragment extends Fragment {
                 // Preselection specific filter criteria: Location (continent, country, city)
                 List<Park> allParks = parksProvider.all();
                 SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
-                SortedSet<String> countries = new TreeSet<>();
+                SortedSet<Country> countries = new TreeSet<>(Country.orderByCountryName(Order.ASC));
+
+                Country countryFromModel = null;
+                City cityFromModel = null;
 
                 GeoLevel geoLevel = null;
                 {   // Opening a block solely to limit variable scope
@@ -139,9 +146,10 @@ public class ParksFragment extends Fragment {
                     Integer locationCityId = filterCriteria.locationCityId;
                     Map<Integer, City> cityIdMap = new HashMap<>();
                     if (locationCityId != null) {
-                        City selectedCity = cityProvider.byCityId(locationCityId, false);
-                        if (selectedCity != null) {
-                            cityIdMap.put(selectedCity.getCityId(), selectedCity);
+                        cityFromModel = cityProvider.byCityId(locationCityId, false);
+                        if (cityFromModel != null) {
+                            cityIdMap.put(cityFromModel.getCityId(), cityFromModel);
+                            countryFromModel = countryProvider.countryBy2letterCC(cityFromModel.getCountry2letter());
                             geoLevel = GeoLevel.City;
                         }
                     }
@@ -149,6 +157,7 @@ public class ParksFragment extends Fragment {
                         // No city given. lets check if we have a country filter
                         String cc = filterCriteria.locationCountryCode2letter;
                         if (cc != null && !cc.equals(SPINNER_DEFAULT_ALL)) {
+                            countryFromModel = countryProvider.countryBy2letterCC(cc);
                             List<City> citiesMatchingCC = cityProvider.byCountryCode(cc);
                             citiesMatchingCC.forEach(city -> cityIdMap.put(city.getCityId(), city));
                             if (!citiesMatchingCC.isEmpty()) {
@@ -164,22 +173,23 @@ public class ParksFragment extends Fragment {
 
                     for (City city : cityIdMap.values()) {
                         cities.add(city);
-                        countries.add(city.getCountry2letter());
+                        Country country = countryProvider.countryBy2letterCC(city.getCountry2letter());
+                        if (country != null) {
+                            countries.add(country);
+                        }
                     }
                 }
                 // TODO Continents should be derived from the country, but we do not have a
                 //      CountryProvider yet.
-                //SortedSet<String> continents = new TreeSet<>();
-//                continents.add("Africa");
-//                continents.add("America");
-//                continents.add("Asia");
-//                continents.add("Australia");
-//                continents.add("Europe");
                 List<Continent> continents = Continent.allContinents();
 
                 updateSpinnerAdapter(spinnerContinent, continents, filterCriteria.locationContinent);
-                updateSpinnerAdapter(spinnerCountry, countries, filterCriteria.locationCountryCode2letter);
-                updateSpinnerAdapter(spinnerCity, cities, filterCriteria.locationCityId);
+                // Selecting by country name is not 100% correct. If there are 2 identically named entries,
+                // a direct selection by ID will be required. For now we don't have this. It may be
+                // required to fix this later, expecially for other spinners (e.g. city spinner).
+                //String countrySelection = countryFromModel == null ? null : countryFromModel.countryName;
+                updateSpinnerAdapter(spinnerCountry, countries, countryFromModel);
+                updateSpinnerAdapter(spinnerCity, cities, cityFromModel);
 
                 // Park table
                 Context pctx = parksTable.getContext();
@@ -254,6 +264,7 @@ public class ParksFragment extends Fragment {
             }
             i++;
         }
+        spinner.setSelection(fallbackId);
     }
 
     private enum GeoLevel {
@@ -272,7 +283,7 @@ public class ParksFragment extends Fragment {
 
     /**
      * An abstract OnItemSelectedListener implementation that unifies onItemSelected() and
-     * onNothingSelected() behaviour. Both call {@link #set(String)}, either with null or the
+     * onNothingSelected() behaviour. Both call {@link #set(Object)}, either with null or the
      * item at spinner position #pos.
      */
     private abstract class GeoSpinnerOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
@@ -280,16 +291,25 @@ public class ParksFragment extends Fragment {
         @Override
         public final void onItemSelected(AdapterView adapterView, View view, int pos, long id) {
             Object item = adapterView.getItemAtPosition(pos);
-            final String newValue;
+            final String newValue;  // The new spinner value (only for "all" check). Must match the spinner value (as of toString()).
+            final Object valueForSet; // The value that goes back to the model
             if (item instanceof String) {
                 newValue = (String)item;
+                valueForSet = newValue;
             } else if (item instanceof City) {
-                newValue = ((City)item).getName();
+                City item1 = (City) item;
+                valueForSet = (City)item1;
+                newValue = item1.getName();
+            } else if (item instanceof Country) {
+                Country item1 = (Country) item;
+                valueForSet = item1.cc2Letter;
+                newValue = item1.countryName;
             } else {
                 newValue = item.toString();
+                valueForSet = newValue;
             }
             boolean all = SPINNER_DEFAULT_ALL.equals(newValue);
-            set(all ? null : newValue);
+            set(all ? null : valueForSet);
         }
 
         @Override
@@ -297,6 +317,6 @@ public class ParksFragment extends Fragment {
             set(null);
         }
 
-        abstract void set(String newValue);
+        abstract void set(Object newValue);
     }
 }

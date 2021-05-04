@@ -1,14 +1,17 @@
 package org.riderun.app.provider.city.rcdb;
 
 import org.riderun.app.model.City;
+import org.riderun.app.model.Continent;
+import org.riderun.app.model.Country;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.country.CountryProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public class CityRCDBProvider implements CityProvider {
+public class CityRCDBProvider implements CityProvider, CountryProvider {
     private static final City UNKNOWN_CITY = new City("Unknown city", 0 , 0, "--");
 
     private final static CityRCDBProvider instance = new CityRCDBProvider();
@@ -59,5 +62,27 @@ public class CityRCDBProvider implements CityProvider {
             }
         }
         return cities;
+    }
+
+    @Override
+    public List<Country> allCountries() {
+        return cityRCDBReader.countries();
+    }
+
+    @Override
+    public Country countryBy2letterCC(String cc) {
+        List<Country> countries = cityRCDBReader.countries();
+        for (Country country : countries) {
+            if (country.cc2Letter.equals(cc)) {
+                return country;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Continent> allContinents() {
+        return Continent.allContinents();
     }
 }

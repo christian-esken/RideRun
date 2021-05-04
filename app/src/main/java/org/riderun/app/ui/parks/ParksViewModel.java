@@ -68,13 +68,18 @@ public class ParksViewModel extends ViewModel {
             case Location:
                 parkList = new ArrayList<>();
                 String cc = criteria.locationCountryCode2letter;
+                Integer cityId = criteria.locationCityId;
                 List<Park> parks = parkprovider.all();
-                if (cc != null) {
+                if (cc != null || cityId != null) {
                     for (Park park : parks) {
                         // TODO Check if assignUnknownCityIfNotFound should be true or false here
                         City city = cityProvider.byCityId(park.getCityId(), true);
-                        if (cc.equals(city.getCountry2letter())) {
-                            parkList.add(park);
+                        if (cc == null || cc.equals(city.getCountry2letter())) {
+                            // country match
+                            if (cityId == null || cityId == city.getCityId()) {
+                                // city match
+                                parkList.add(park);
+                            }
                         }
                     }
                 } else {

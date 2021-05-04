@@ -7,14 +7,14 @@ import java.util.List;
 
 public interface CountryProvider {
     // Returns all countries known to this Provider
-    List<Country> all();
+    List<Country> allCountries();
 
     /**
      * Returns the country for the given countryId
      * @param cc The 2 letter country code
      * @return The matching country. null if no such country exists
      */
-    Country by2letterCC(String cc);
+    Country countryBy2letterCC(String cc);
 
-    List<Continent> continents();
+    List<Continent> allContinents();
 }

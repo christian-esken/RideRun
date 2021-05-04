@@ -106,6 +106,10 @@ public class CityRCDBReader {
         return CITIES;
     }
 
+    public List<Country> countries() {
+        return COUNTRIES;
+    }
+
     private class CityReadHelper {
         final String locationName;
         final int locationId;
