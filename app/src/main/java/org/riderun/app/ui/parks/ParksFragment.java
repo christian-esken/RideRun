@@ -19,6 +19,7 @@ import com.google.android.material.chip.Chip;
 
 import org.riderun.app.R;
 import org.riderun.app.model.City;
+import org.riderun.app.model.Continent;
 import org.riderun.app.model.GeoPrecision;
 import org.riderun.app.model.Park;
 import org.riderun.app.provider.ProviderFactory;
@@ -27,6 +28,7 @@ import org.riderun.app.provider.park.ParksProvider;
 import org.riderun.app.storage.Order;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +132,6 @@ public class ParksFragment extends Fragment {
                 List<Park> allParks = parksProvider.all();
                 SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
                 SortedSet<String> countries = new TreeSet<>();
-                SortedSet<String> continents = new TreeSet<>();
 
                 GeoLevel geoLevel = null;
                 {   // Opening a block solely to limit variable scope
@@ -168,11 +169,13 @@ public class ParksFragment extends Fragment {
                 }
                 // TODO Continents should be derived from the country, but we do not have a
                 //      CountryProvider yet.
-                continents.add("Africa");
-                continents.add("America");
-                continents.add("Asia");
-                continents.add("Australia");
-                continents.add("Europe");
+                //SortedSet<String> continents = new TreeSet<>();
+//                continents.add("Africa");
+//                continents.add("America");
+//                continents.add("Asia");
+//                continents.add("Australia");
+//                continents.add("Europe");
+                List<Continent> continents = Continent.allContinents();
 
                 updateSpinnerAdapter(spinnerContinent, continents, filterCriteria.locationContinent);
                 updateSpinnerAdapter(spinnerCountry, countries, filterCriteria.locationCountryCode2letter);
@@ -226,7 +229,7 @@ public class ParksFragment extends Fragment {
      * @param entries
      * @param selection
      */
-    private void updateSpinnerAdapter(Spinner spinner, SortedSet<?> entries, Object selection) {
+    private void updateSpinnerAdapter(Spinner spinner, Collection<?> entries, Object selection) {
         ArrayList al = new ArrayList(entries.size()+1);
         al.add(SPINNER_DEFAULT_ALL);
         entries.forEach(entry -> al.add(entry));

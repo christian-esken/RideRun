@@ -83,4 +83,12 @@ public class City {
             }
         };
     }
+
+    @Override
+    public String toString() {
+        // The output is explicitly tailored to the needs of the the
+        // city Spinner in the ParksFragment. If we need diffenent toString()
+        // methods in the future, then City can be subclasssed, overrinding toString().
+        return name;
+    }
 }

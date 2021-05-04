@@ -102,7 +102,12 @@ public class ParkRCDBReader {
         return COUNTRY_IDS.contains(cityId);
     }
 
-    public Integer city2country(Integer cityid) {
+    /**
+     * Returns the rcdb country id for the given rcdb city id
+     * @param cityid
+     * @return
+     */
+    public Integer city2countryId(Integer cityid) {
         if (cityid == null) {
             return null;
         }

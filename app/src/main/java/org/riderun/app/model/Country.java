@@ -1,19 +1,16 @@
 package org.riderun.app.model;
 
-import org.riderun.app.storage.Order;
-
-import java.util.Comparator;
-
 public class Country {
-    public final String continentName;
-    public final String continentCode;
+    public final Continent continent;
+    // Country codes. See ISO, e.g. https://www.iso.org/obp/ui/#search
     public final String countryName;
-    public final String cc2Letter;
+    public final int locationId;
+    public final String cc2Letter; // ISO-3166
 
-    public Country(String continentName, String continentCode, String countryName, String cc2Letter) {
-        this.continentName = continentName;
-        this.continentCode = continentCode;
+    public Country(Continent continent, String countryName, int locationId, String cc2Letter) {
+        this.continent = continent;
         this.countryName = countryName;
+        this.locationId = locationId;
         this.cc2Letter = cc2Letter;
     }
 

@@ -7,21 +7,6 @@
     android:orientation="vertical"
     tools:context="org.riderun.app.ui.parks.ParksFragment">
 
-    <TextView
-        android:id="@+id/text_parks"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        tools:text="@string/parks_nearby_preselect" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <com.google.android.material.chip.ChipGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -134,10 +119,6 @@
 
     </FrameLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:id="@+id/filter_view"
         android:layout_width="match_parent"
@@ -151,10 +132,6 @@
             android:text="@string/parks_filter_help" />
     </LinearLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <EditText
         android:id="@+id/parks_name_filter"
         android:layout_width="match_parent"
@@ -163,10 +140,6 @@
         android:contentDescription="Park name filter"
         android:ems="10"
         android:inputType="textFilter" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
