@@ -6,11 +6,8 @@ import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.count.CountProvider;
 import org.riderun.app.provider.count.db.PoiKey;
-import org.riderun.app.provider.count.db.RcdbCountProvider;
 import org.riderun.app.provider.park.ParksProvider;
 import org.riderun.app.provider.ride.RidesProvider;
-import org.riderun.app.provider.ride.mock.RidesMockedProvider;
-import org.riderun.app.provider.park.mock.ParkMockReader;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,15 +24,15 @@ import androidx.lifecycle.ViewModel;
 public class RidesViewModel extends ViewModel {
     private final MutableLiveData<RidesData> data = new MutableLiveData<>();
     // The following fields are used to update
-    CountProvider countProvider = ProviderFactory.countProvider();
-    ParksProvider parks = ProviderFactory.parksProvider();
-    RidesProvider ridesProvider = ProviderFactory.ridesProvider();
+    private final CountProvider countProvider = ProviderFactory.countProvider();
+    private final ParksProvider parks = ProviderFactory.parksProvider();
+    private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
     List<Ride> rides;
     //Map<PoiKey, Count> counts;
 
     public RidesViewModel() {
         Park park = parks.all().get(0);
-        rides = ridesProvider.rides();
+        rides = ridesProvider.ridesForPark(park.getRcdbId());
         RidesData rdata = new RidesData(park, rides, reloadCounts());
         data.setValue(rdata);
     }

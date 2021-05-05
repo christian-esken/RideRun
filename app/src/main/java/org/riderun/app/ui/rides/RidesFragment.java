@@ -18,6 +18,7 @@ import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.ride.RidesProvider;
 
 import java.util.List;
 
@@ -34,12 +35,12 @@ import androidx.lifecycle.ViewModelProvider;
 public class RidesFragment extends Fragment {
 
     private RidesViewModel ridesViewModel;
-    CityProvider cityProvider;
+    CityProvider cityProvider = ProviderFactory.cityProvider();
+    RidesProvider ridesProvider = ProviderFactory.ridesProvider();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        cityProvider = ProviderFactory.cityProvider();
-        ridesViewModel = new ViewModelProvider(this).get(RidesViewModel.class);
+        ridesViewModel = new ViewModelProvider(this.getActivity()).get(RidesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_rides, container, false);
         final TextView textView = root.findViewById(R.id.textView_location);
         final TextView countsView = root.findViewById(R.id.textViewCounts);

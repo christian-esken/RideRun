@@ -5,5 +5,6 @@ import org.riderun.app.model.Ride;
 import java.util.List;
 
 public interface RidesProvider {
-    public List<Ride> rides();
+    public List<Ride> allRides();
+    public List<Ride> ridesForPark(int parkId);
 }

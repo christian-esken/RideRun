@@ -31,7 +31,6 @@ import org.riderun.app.storage.Order;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +65,9 @@ public class ParksFragment extends Fragment {
         cityProvider = ProviderFactory.cityProvider();
         countryProvider = ProviderFactory.countryProvider();
 
-        ParksViewModel parksViewModel = new ViewModelProvider(this).get(ParksViewModel.class);
+        ParksViewModel parksViewModel = new ViewModelProvider(this.getActivity()).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
-        final Chip preselectionAll = root.findViewById(R.id.chip_parks_all);
+        final Chip preselectionAll = root.findViewById(R.id.chip_parks_favorites);
         final Chip preselectionLocation = root.findViewById(R.id.chip_parks_location);
         final Chip preselectionNearby = root.findViewById(R.id.chip_parks_nearby);
         final Chip preselectionTour = root.findViewById(R.id.chip_parks_tour);

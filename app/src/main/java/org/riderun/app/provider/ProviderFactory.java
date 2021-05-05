@@ -11,6 +11,7 @@ import org.riderun.app.provider.park.mock.ParksMockProvider;
 import org.riderun.app.provider.park.rcdb.ParksRCDBProvider;
 import org.riderun.app.provider.ride.RidesProvider;
 import org.riderun.app.provider.ride.mock.RidesMockedProvider;
+import org.riderun.app.provider.ride.rcdb.RidesRCDBProvider;
 
 
 /**
@@ -33,11 +34,11 @@ public class ProviderFactory {
     private final static boolean MOCK = false;
 
     public static ParksProvider parksProvider() {
-        return MOCK ? ParksMockProvider.instance() :ParksRCDBProvider.instance();
+        return MOCK ? ParksMockProvider.instance() : ParksRCDBProvider.instance();
     }
 
     public static RidesProvider ridesProvider() {
-        return MOCK ? RidesMockedProvider.instance() : RidesMockedProvider.instance(); // TODO Real provider
+        return MOCK ? RidesMockedProvider.instance() : RidesRCDBProvider.instance();
     }
 
     public static CountryProvider countryProvider() {

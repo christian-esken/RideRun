@@ -8,7 +8,7 @@
     <!-- ParksSelector -->
     <string name="parks_select_header">Select Parks</string>
 
-    <string name="parks_all_preselect">All</string>
+    <string name="parks_favorites_preselect">Favorites</string>
     <string name="parks_nearby_preselect">Nearby</string>
     <string name="parks_location_preselect">Location</string>
     <string name="parks_tour_preselect">Tour</string>

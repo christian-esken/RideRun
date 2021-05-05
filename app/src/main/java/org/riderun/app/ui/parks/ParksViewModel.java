@@ -21,8 +21,8 @@ import androidx.lifecycle.ViewModel;
  */
 public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
-    private MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
-    private ParksProvider parksProvider;
+    private final MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
+    private final ParksProvider parksProvider;
     private final CityProvider cityProvider;
 
     public ParksViewModel() {

@@ -14,32 +14,36 @@
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_parks_all"
+            android:id="@+id/chip_parks_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="@string/parks_all_preselect" />
+            android:text="@string/parks_location_preselect"
+            app:chipIcon="@android:drawable/ic_dialog_map" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_parks_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="true"
+            android:text="@string/parks_favorites_preselect"
+            app:chipIcon="@android:drawable/btn_star" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_parks_nearby"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="@string/parks_nearby_preselect" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_parks_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="@string/parks_location_preselect" />
+            android:text="@string/parks_nearby_preselect"
+            app:chipIcon="@android:drawable/ic_menu_mylocation" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_parks_tour"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="true"
-            android:text="@string/parks_tour_preselect" />
+            android:text="@string/parks_tour_preselect"
+            app:chipIcon="?android:attr/actionModeFindDrawable" />
 
     </com.google.android.material.chip.ChipGroup>
 
