@@ -113,22 +113,24 @@ public class ParksViewModel extends ViewModel {
 
         // ORDER BY
         OrderBy orderBy = criteria.orderBy;
+        int orderMultiplier = criteria.orderDirection.multiplier();
         switch (orderBy) {
             case Distance:
                 parksMatching.sort( (a,b) -> {
                     double distanceA = a.getGeoCoordinate().sortingDistance(geo);
                     double distanceB = b.getGeoCoordinate().sortingDistance(geo);
-                    return distanceA < distanceB ? -1 : (distanceA == distanceB ? 0 : 1);
+                    int order = distanceA < distanceB ? -1 : (distanceA == distanceB ? 0 : 1);
+                    return orderMultiplier * order;
                 });
                 break;
             case Name:
-                parksMatching.sort( (a,b) -> a.getName().compareTo(b.getName()));
+                parksMatching.sort( (a,b) -> orderMultiplier * a.getName().compareTo(b.getName()));
                 break;
             case AttractionCount:
                 parksMatching.sort( (a,b) -> {
                     int countA = ridesProvider.ridesForPark(a.getRcdbId()).size();
                     int countB = ridesProvider.ridesForPark(b.getRcdbId()).size();
-                    return countB - countA;
+                    return orderMultiplier * (countB - countA);
                 });
                 break;
             default:
@@ -156,6 +158,17 @@ public class ParksViewModel extends ViewModel {
 
     public void setLocationCityId(Integer cityId) {
         postModifiedFilter(fc().locationCityId(cityId));
+    }
+
+    public void setNewOrder(OrderBy orderBy) {
+        ParksFilterCriteria.Builder fc = fc();
+        if (fc.orderBy == orderBy) {
+            // If the order by criteria is the same as before, we toggle the order direction.
+            postModifiedFilter(fc.orderDirection(fc.orderDirection.reverse()));
+        } else {
+            // user wants a new order.select the new order with its default order direction
+            postModifiedFilter(fc().orderBy(orderBy).orderDirection(orderBy.orderDirection()));
+        }
     }
 
     /**
@@ -191,4 +204,5 @@ public class ParksViewModel extends ViewModel {
     public LiveData<ParksData> getLiveParksData() {
         return liveParksData;
     }
+
 }

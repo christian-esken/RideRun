@@ -146,7 +146,6 @@ public class ParksFragment extends Fragment {
                 // Preselection specific filter criteria
 
                 // Preselection specific filter criteria: Location (continent, country, city)
-                List<Park> allParks = parksProvider.all();
                 SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
                 SortedSet<Country> countries = new TreeSet<>(Country.orderByCountryName(Order.ASC));
 
@@ -217,9 +216,9 @@ public class ParksFragment extends Fragment {
                 } else {
                     TableRow th = new TableRow(pctx);
                     th.setBackgroundColor(Color.LTGRAY);
-                    addTextcolToRow(pctx, th, "Park");
-                    addTextcolToRow(pctx, th, "Count");
-                    addTextcolToRow(pctx, th, "Location");
+                    addTextcolToRow(pctx, th, "Park", OrderBy.Name, parksViewModel);
+                    addTextcolToRow(pctx, th, "Count", OrderBy.AttractionCount, parksViewModel);
+                    addTextcolToRow(pctx, th, "Location", OrderBy.Distance, parksViewModel);
                     parksTable.addView(th);
 
 
@@ -276,10 +275,17 @@ public class ParksFragment extends Fragment {
         return root;
     }
 
-    private void addTextcolToRow(Context pctx, TableRow th, String text) {
-        TextView thRide = new TextView(pctx);
-        thRide.setText(text);
-        th.addView(thRide);
+    private TextView addTextcolToRow(Context pctx, TableRow th, String text, OrderBy orderBy, ParksViewModel pvm) {
+        TextView textView = new TextView(pctx);
+        textView.setText(text);
+        th.addView(textView);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pvm.setNewOrder(orderBy);
+            }
+        });
+        return textView;
     }
 
     /**
@@ -289,27 +295,27 @@ public class ParksFragment extends Fragment {
      *     Note: As this method replaces the ArrayAdapter of the Spinner, update methods may
      *      get triggered.
      *
-     * @param spinner
-     * @param entries
-     * @param selection
+     * @param spinner to update
+     * @param entries to add to the spinner
+     * @param selection the entry to select in the spinner. Must match on of the values from entries
      */
     private void updateSpinnerAdapter(Spinner spinner, Collection<?> entries, Object selection) {
-        ArrayList al = new ArrayList(entries.size()+1);
+        ArrayList<Object> al = new ArrayList<>(entries.size()+1);
         al.add(SPINNER_DEFAULT_ALL);
         entries.forEach(entry -> al.add(entry));
-        ArrayAdapter<String> aaContinent = new ArrayAdapter<>(spinner.getContext(), android.R.layout.simple_list_item_1, al);
+        ArrayAdapter<?> aaContinent = new ArrayAdapter<>(spinner.getContext(), android.R.layout.simple_list_item_1, al);
         spinner.setAdapter(aaContinent);
         setSpinnerSelection(spinner, al, selection, 0);
     }
 
     /**
-     * Set selection on the spinner element that matches the given String. Hint: The spinnerArray
+     * Set selection on the spinner element that matches the given Object. Hint: The spinnerArray
      * should be the same ArrayList that is used for the Adapter.
-     * @param spinner
-     * @param spinnerArray
-     * @param match
+     * @param spinner on which the selection should be set
+     * @param spinnerArray of the adapter
+     * @param match The object to match. )It is compared with equals()
      */
-    private void setSpinnerSelection(Spinner spinner, ArrayList<String> spinnerArray, Object match, int fallbackId) {
+    private void setSpinnerSelection(Spinner spinner, ArrayList<?> spinnerArray, Object match, int fallbackId) {
         int i = 0;
         for (Object s : spinnerArray) {
             if (s.equals(match)) {
