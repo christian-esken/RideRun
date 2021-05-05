@@ -1,6 +1,7 @@
 package org.riderun.app.ui.parks;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,14 +21,20 @@ import com.google.android.material.chip.Chip;
 import org.riderun.app.R;
 import org.riderun.app.model.City;
 import org.riderun.app.model.Continent;
+import org.riderun.app.model.Count;
 import org.riderun.app.model.Country;
 import org.riderun.app.model.GeoPrecision;
 import org.riderun.app.model.Park;
+import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.count.CountProvider;
+import org.riderun.app.provider.count.db.PoiKey;
 import org.riderun.app.provider.country.CountryProvider;
 import org.riderun.app.provider.park.ParksProvider;
+import org.riderun.app.provider.ride.RidesProvider;
 import org.riderun.app.storage.Order;
+import org.riderun.app.ui.rides.RidesViewModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +62,9 @@ public class ParksFragment extends Fragment {
     ParksProvider parksProvider;
     CityProvider cityProvider;
     CountryProvider countryProvider;
+    private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
+    private final CountProvider countProvider = ProviderFactory.countProvider();
+
 
     // Note onCreateView looks up the UI elements, install listeners and starts observing the
     // view model.
@@ -64,6 +74,9 @@ public class ParksFragment extends Fragment {
         parksProvider = ProviderFactory.parksProvider();
         cityProvider = ProviderFactory.cityProvider();
         countryProvider = ProviderFactory.countryProvider();
+
+        // We retrieve a reference to the RidesViewModel, so we can select a new park
+        RidesViewModel ridesViewModel = new ViewModelProvider(this.getActivity()).get(RidesViewModel.class);;
 
         ParksViewModel parksViewModel = new ViewModelProvider(this.getActivity()).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
@@ -201,11 +214,42 @@ public class ParksFragment extends Fragment {
                     tv.setText("No matching park .. clear filters"); // TODO translation
                     parksTable.addView(tv);
                 } else {
+                    TableRow th = new TableRow(pctx);
+                    th.setBackgroundColor(Color.LTGRAY);
+                    addTextcolToRow(pctx, th, "Park");
+                    addTextcolToRow(pctx, th, "Count");
+                    addTextcolToRow(pctx, th, "Location");
+                    parksTable.addView(th);
+
+
+
                     for (Park park : parksList) {
                         TableRow tr = new TableRow(pctx);
                         Context ctx = tr.getContext();
                         TextView parkName = new TextView(ctx);
                         parkName.setText(park.getName());
+                        parkName.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                TextView tv = (TextView)v;
+                                List<Park> parks = parksProvider.byName(tv.getText().toString(), 1);
+                                if (!parks.isEmpty()) {
+                                    Park park = parks.get(0);
+                                    List<Ride> rides = ridesProvider.ridesForPark(park.getRcdbId());
+                                    Map<PoiKey, Count> counts = new HashMap<>();
+                                    for (Ride ride : rides) {
+                                        counts.putAll(countProvider.getByPoiKey(Integer.toString(ride.rcdbId())));
+                                    }
+                                    ridesViewModel.setNewPark(park, rides, counts);
+                                }
+
+                            }
+                        });
+                        TextView rideCountText = new TextView(ctx);
+                        List<Ride> rides = ridesProvider.ridesForPark(park.getRcdbId());
+                        rideCountText.setText(Integer.toString(rides.size()));
+
+
                         TextView cityName = new TextView(ctx);
                         City city = cityProvider.byCityId(park.getCityId(), true);
                         cityName.setText(city.getName() + " (" + city.getCountry2letter() + ")");
@@ -215,6 +259,7 @@ public class ParksFragment extends Fragment {
                         geoView.setText(geoString);
 
                         tr.addView(parkName);
+                        tr.addView(rideCountText);
                         tr.addView(cityName);
                         tr.addView(geoView);
 
@@ -225,6 +270,12 @@ public class ParksFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void addTextcolToRow(Context pctx, TableRow th, String text) {
+        TextView thRide = new TextView(pctx);
+        thRide.setText(text);
+        th.addView(thRide);
     }
 
     /**

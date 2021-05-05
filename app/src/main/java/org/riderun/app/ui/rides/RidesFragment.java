@@ -36,7 +36,6 @@ public class RidesFragment extends Fragment {
 
     private RidesViewModel ridesViewModel;
     CityProvider cityProvider = ProviderFactory.cityProvider();
-    RidesProvider ridesProvider = ProviderFactory.ridesProvider();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
