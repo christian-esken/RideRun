@@ -1,6 +1,7 @@
 package org.riderun.app.ui.parks;
 
 import org.riderun.app.model.GeoCoordinate;
+import org.riderun.app.storage.Order;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class ParksFilterCriteria {
     // Preselection by Nearby: GeoCoordinate (e.g. map center). By default it is the users current
     // position.
     final GeoCoordinate geoCoordinate;
+
     // Preselection by Location: continent, country, city (all optional)
     final String locationContinent;
     final String locationCountryCode2letter;
@@ -21,27 +23,36 @@ public class ParksFilterCriteria {
     // Preselection by Tour: tour name
     final String tourName;
 
-    // Filters
+    // WHERE: Filters
     final String nameFilter;
-    // Maximum number of parks to show
+
+    // ORDER BY:
+    final OrderBy orderBy;
+    final Order orderDirection;
+
+    // LIMIT: Maximum number of parks to show
     final int limit;
 
     // This constructor will get very many parameters. Possibly change to Builder pattern
     private ParksFilterCriteria(ParksPreselection preselection,
-                               GeoCoordinate geoCoordinate,
-                               String locationContinent,
-                               String locationCountryCode2letter,
-                               Integer locationCityId,
-                               String tourName,
-                               String nameFilter,
-                               int limit) {
+                                GeoCoordinate geoCoordinate,
+                                String locationContinent,
+                                String locationCountryCode2letter,
+                                Integer locationCityId,
+                                String tourName,
+                                String nameFilter,
+                                OrderBy orderBy,
+                                Order orderDirection,
+                                int limit) {
         this.preselection = preselection;
         this.geoCoordinate = geoCoordinate;
-        this.nameFilter = nameFilter;
         this.locationContinent = locationContinent;
         this.locationCountryCode2letter = locationCountryCode2letter;
         this.locationCityId = locationCityId;
+        this.orderBy = orderBy;
+        this.orderDirection = orderDirection;
         this.tourName = tourName;
+        this.nameFilter = nameFilter;
         this.limit = limit;
     }
 
@@ -56,13 +67,24 @@ public class ParksFilterCriteria {
                 Objects.equals(locationContinent, that.locationContinent) &&
                 Objects.equals(locationCountryCode2letter, that.locationCountryCode2letter) &&
                 Objects.equals(locationCityId, that.locationCityId) &&
+                Objects.equals(orderBy, that.orderBy) &&
+                Objects.equals(orderDirection, that.orderDirection) &&
                 Objects.equals(tourName, that.tourName) &&
                 Objects.equals(nameFilter, that.nameFilter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(preselection, geoCoordinate, locationContinent, locationCountryCode2letter, locationCityId, tourName, nameFilter, limit);
+        return Objects.hash(
+                preselection,
+                geoCoordinate,
+                locationContinent,
+                locationCountryCode2letter,
+                locationCityId,
+                orderBy,
+                orderDirection,
+                tourName,
+                nameFilter, limit);
     }
 
     public static class Builder {
@@ -75,6 +97,12 @@ public class ParksFilterCriteria {
         String tourName;
 
         String nameFilter = "";
+
+        // ORDER BY:
+        OrderBy orderBy;
+        Order orderDirection;
+
+        // LIMIT
         int limit = 50;
 
 
@@ -99,6 +127,8 @@ public class ParksFilterCriteria {
             builder.locationContinent = source.locationContinent;
             builder.locationCountryCode2letter = source.locationCountryCode2letter;
             builder.locationCityId = source.locationCityId;
+            builder.orderBy = source.orderBy;
+            builder.orderDirection = source.orderDirection;
             builder.tourName = source.tourName;
             builder.limit = source.limit;
 
@@ -113,6 +143,8 @@ public class ParksFilterCriteria {
                     locationCityId,
                     tourName,
                     nameFilter,
+                    orderBy,
+                    orderDirection,
                     limit
                     );
         }
@@ -149,6 +181,16 @@ public class ParksFilterCriteria {
 
         public Builder nameFilter(String nameFilter) {
             this.nameFilter = nameFilter;
+            return this;
+        }
+
+        public Builder orderBy(OrderBy orderBy) {
+            this.orderBy = orderBy;
+            return this;
+        }
+
+        public Builder orderDirection(Order orderDirection) {
+            this.orderDirection = orderDirection;
             return this;
         }
 

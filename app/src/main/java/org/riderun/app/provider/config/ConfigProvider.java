@@ -1,6 +1,8 @@
 package org.riderun.app.provider.config;
 
 import org.riderun.app.model.GeoCoordinate;
+import org.riderun.app.storage.Order;
+import org.riderun.app.ui.parks.OrderBy;
 import org.riderun.app.ui.parks.ParksPreselection;
 
 public interface ConfigProvider {
@@ -26,4 +28,8 @@ public interface ConfigProvider {
      * @return the users preferred preselection
      */
     GeoCoordinate geoCoordinate();
+
+    OrderBy orderBy();
+
+    Order orderDirection();
 }

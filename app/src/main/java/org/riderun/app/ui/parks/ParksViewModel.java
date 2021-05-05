@@ -8,6 +8,7 @@ import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.config.ConfigDefaultsProvider;
 import org.riderun.app.provider.config.ConfigProvider;
 import org.riderun.app.provider.park.ParksProvider;
+import org.riderun.app.provider.ride.RidesProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class ParksViewModel extends ViewModel {
     private final MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
     private final ParksProvider parksProvider;
     private final CityProvider cityProvider;
+    private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
 
     public ParksViewModel() {
         // Set providers
@@ -35,6 +37,8 @@ public class ParksViewModel extends ViewModel {
         ParksFilterCriteria filterCriteria = new ParksFilterCriteria.Builder()
                 .preselection(config.parkPreselection())
                 .geoCoordinate(config.geoCoordinate())
+                .orderBy(config.orderBy())
+                .orderDirection(config.orderDirection())
                 .limit(config.parkLimit()).build();
         ParksData appliedFilter = applyFilter(filterCriteria, parksProvider);
         liveParksData.setValue(appliedFilter);
@@ -55,8 +59,6 @@ public class ParksViewModel extends ViewModel {
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
         boolean hasFilter = hasNameFilter; // currently there is only one filter
         GeoCoordinate geo = criteria.geoCoordinate;
-        boolean hasGeosorting = !geo.isEmpty();
-        boolean hasSorting = hasGeosorting;
 
         int limit = criteria.limit;
         // PRESELECTION : TODO Implement the other preselection methods (currently always: ALL)
@@ -110,14 +112,28 @@ public class ParksViewModel extends ViewModel {
         }
 
         // ORDER BY
-        if (hasSorting) {
-            if (hasGeosorting) {
+        OrderBy orderBy = criteria.orderBy;
+        switch (orderBy) {
+            case Distance:
                 parksMatching.sort( (a,b) -> {
                     double distanceA = a.getGeoCoordinate().sortingDistance(geo);
                     double distanceB = b.getGeoCoordinate().sortingDistance(geo);
                     return distanceA < distanceB ? -1 : (distanceA == distanceB ? 0 : 1);
                 });
-            }
+                break;
+            case Name:
+                parksMatching.sort( (a,b) -> a.getName().compareTo(b.getName()));
+                break;
+            case AttractionCount:
+                parksMatching.sort( (a,b) -> {
+                    int countA = ridesProvider.ridesForPark(a.getRcdbId()).size();
+                    int countB = ridesProvider.ridesForPark(b.getRcdbId()).size();
+                    return countB - countA;
+                });
+                break;
+            default:
+                // Do not sort. Keep parksMatching in its order.
+                break;
         }
 
         // LIMIT

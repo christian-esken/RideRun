@@ -17,6 +17,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.riderun.app.R;
 import org.riderun.app.model.City;
@@ -241,6 +242,9 @@ public class ParksFragment extends Fragment {
                                         counts.putAll(countProvider.getByPoiKey(Integer.toString(ride.rcdbId())));
                                     }
                                     ridesViewModel.setNewPark(park, rides, counts);
+
+                                    // .setAction("Action", null)
+                                    Snackbar.make(v, "Park selected: " + park.getName(), Snackbar.LENGTH_SHORT).show();
                                 }
 
                             }
