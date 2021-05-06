@@ -1,6 +1,7 @@
 package org.riderun.app.provider.park.mock;
 
 import org.riderun.app.model.Park;
+import org.riderun.app.provider.ProviderType;
 import org.riderun.app.provider.park.ParksProvider;
 
 import java.util.ArrayList;
@@ -42,5 +43,21 @@ public class ParksMockProvider implements ParksProvider {
     @Override
     public List<Park> closeby(double longitude, double latitude, int count) {
         return null;
+    }
+
+    // --- Provider -------------
+    @Override
+    public String id() {
+        return "mock";
+    }
+
+    @Override
+    public String name() {
+        return "Mock Parks";
+    }
+
+    @Override
+    public ProviderType type() {
+        return ProviderType.Location;
     }
 }

@@ -1,14 +1,15 @@
 package org.riderun.app.model;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
- *  The count for one Ride. In other words, the user-specific data for a ride. At the moment
+ *  The count for one Ride. In other words, the user-specific data for a ride.
+ *
+ *  At the moment
  *  we keep the dynamic data in a different class (not In Ride). Reasons:
  *  1. Make it easier to send type specific update notifications. 2. Count is much more likely to
  *  change than Ride. 3. Count is user specific data, while Ride is master data. 4. User data
@@ -20,6 +21,9 @@ import java.util.TreeSet;
 public class Count {
     private final SortedSet<CountEntry> counts = new TreeSet<>();
 
+    /**
+     * Creates a new Object, with default values: No counts, no comment, not liked, and unmodified
+     */
     public Count() {
     }
 
@@ -52,10 +56,6 @@ public class Count {
      */
     public void addCountNow(String comment) {
         counts.add(new CountEntry(Instant.now(), TimeZone.getDefault().getID(), comment));
-    }
-
-    public void addCount(Instant instant, ZoneId zoneId, String comment) {
-        counts.add(new CountEntry(instant, zoneId.getId(), comment));
     }
 
     public void addCount(Instant instant, String timezone, String comment) {

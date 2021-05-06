@@ -1,13 +1,9 @@
 package org.riderun.app.provider.ride.mock;
 
-import org.riderun.app.model.City;
-import org.riderun.app.model.Count;
-import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
+import org.riderun.app.provider.ProviderType;
 import org.riderun.app.provider.ride.RidesProvider;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +39,22 @@ public class RidesMockedProvider implements RidesProvider {
     @Override
     public List<Ride> ridesForPark(int parkId) {
         return RIDES.stream().filter(p -> p.rcdbParkId() == parkId).collect(Collectors.toList());
+    }
+
+    // --- Provider -------------
+    @Override
+    public String id() {
+        return "mock";
+    }
+
+    @Override
+    public String name() {
+        return "Mocked Roller Coaster Database";
+    }
+
+    @Override
+    public ProviderType type() {
+        return ProviderType.Attraction;
     }
 
 }

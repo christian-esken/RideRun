@@ -11,6 +11,8 @@ import java.util.TimeZone;
 public class CountEntry implements Comparable<CountEntry> {
     final Instant instant;
     final String timezone;
+    // A free optional comment about the count. For example "Guided Tour 3", "Highly recommended",
+    // "Rollercoater left side (Winja's Force)"
     final String comment;
 
     public CountEntry(Instant instant, String timezone, String comment) {

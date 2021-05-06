@@ -1,6 +1,6 @@
 package org.riderun.app.model;
 
-public class Ride implements Attraction {
+public class Ride {
     private final String name;
     private final int rcdbRideId;
     private final int rcdbParkId;
@@ -12,6 +12,9 @@ public class Ride implements Attraction {
     private final String statusName;
     private final String openedOp;
     private final String openedDate;
+    // description
+    // image
+    // location / how to find / Address
 
     public Ride(String name, int rcdbRideId, int rcdbParkId, int typeId, String typeName, int aufbauId, String aufbauName, int statusId, String statusName, String openedOp, String openedDate) {
         this.name = name;
@@ -30,20 +33,8 @@ public class Ride implements Attraction {
     public Ride(String name, int rcdbRideId, int rcdbParkId) {
         this(name, rcdbRideId, rcdbParkId, 1, "Steel", 105, "Flying", 93, "Operating", "", "2021");
     }
-    // description
-    // image
-    // location / how to find
 
-    // --- Attraction descriptor ---
-    @Override
-    public String attractionId() {
-        return "ride";
-    }
 
-    @Override
-    public String attractionTitle() {
-        return "Roller Coaster Ride";
-    }
 
     // --- getters --------------------------
 

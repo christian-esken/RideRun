@@ -24,7 +24,7 @@ public class ParksFilterCriteria {
     final String tourName;
 
     // WHERE: Filters
-    final String nameFilter;
+    final String parkNameFilter;
 
     // ORDER BY:
     final OrderBy orderBy;
@@ -40,7 +40,7 @@ public class ParksFilterCriteria {
                                 String locationCountryCode2letter,
                                 Integer locationCityId,
                                 String tourName,
-                                String nameFilter,
+                                String parkNameFilter,
                                 OrderBy orderBy,
                                 Order orderDirection,
                                 int limit) {
@@ -52,7 +52,7 @@ public class ParksFilterCriteria {
         this.orderBy = orderBy;
         this.orderDirection = orderDirection;
         this.tourName = tourName;
-        this.nameFilter = nameFilter;
+        this.parkNameFilter = parkNameFilter;
         this.limit = limit;
     }
 
@@ -70,7 +70,7 @@ public class ParksFilterCriteria {
                 Objects.equals(orderBy, that.orderBy) &&
                 Objects.equals(orderDirection, that.orderDirection) &&
                 Objects.equals(tourName, that.tourName) &&
-                Objects.equals(nameFilter, that.nameFilter);
+                Objects.equals(parkNameFilter, that.parkNameFilter);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ParksFilterCriteria {
                 orderBy,
                 orderDirection,
                 tourName,
-                nameFilter, limit);
+                parkNameFilter, limit);
     }
 
     public static class Builder {
@@ -123,7 +123,7 @@ public class ParksFilterCriteria {
             Builder builder = new Builder();
             builder.preselection = source.preselection;
             builder.geoCoordinate = source.geoCoordinate;
-            builder.nameFilter = source.nameFilter;
+            builder.nameFilter = source.parkNameFilter;
             builder.locationContinent = source.locationContinent;
             builder.locationCountryCode2letter = source.locationCountryCode2letter;
             builder.locationCityId = source.locationCityId;

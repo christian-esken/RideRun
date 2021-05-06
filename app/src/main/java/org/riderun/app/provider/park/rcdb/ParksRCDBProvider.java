@@ -1,6 +1,7 @@
 package org.riderun.app.provider.park.rcdb;
 
 import org.riderun.app.model.Park;
+import org.riderun.app.provider.ProviderType;
 import org.riderun.app.provider.park.ParksProvider;
 
 import java.util.ArrayList;
@@ -43,4 +44,21 @@ public class ParksRCDBProvider implements ParksProvider {
     public List<Park> closeby(double longitude, double latitude, int count) {
         return null;
     }
+
+    // --- Provider -------------
+    @Override
+    public String id() {
+        return "rcdb";
+    }
+
+    @Override
+    public String name() {
+        return "Roller Coaster Database Parks";
+    }
+
+    @Override
+    public ProviderType type() {
+        return ProviderType.Location;
+    }
+
 }

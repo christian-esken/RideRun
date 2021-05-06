@@ -55,7 +55,7 @@ public class ParksViewModel extends ViewModel {
      * @return The matching, filtered and sorted Parks
      */
     private ParksData applyFilter(ParksFilterCriteria criteria, ParksProvider parkprovider) {
-        String nameFilter = criteria.nameFilter.toLowerCase();
+        String nameFilter = criteria.parkNameFilter.toLowerCase();
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
         boolean hasFilter = hasNameFilter; // currently there is only one filter
         GeoCoordinate geo = criteria.geoCoordinate;

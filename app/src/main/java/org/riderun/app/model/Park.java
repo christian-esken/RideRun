@@ -7,8 +7,7 @@ public class Park {
     private GeoCoordinate geoCoordinate;
     // description
     // image
-    // location / how to find
-    // Adress
+    // location / how to find / Address
 
     public Park(String name, int rcdbId, Integer cityId, double longitude, double latitude) {
         this.name = name;
