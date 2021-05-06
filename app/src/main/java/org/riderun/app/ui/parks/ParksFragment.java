@@ -81,7 +81,7 @@ public class ParksFragment extends Fragment {
 
         ParksViewModel parksViewModel = new ViewModelProvider(this.getActivity()).get(ParksViewModel.class);
         View root = inflater.inflate(R.layout.fragment_parks, container, false);
-        final Chip preselectionAll = root.findViewById(R.id.chip_parks_favorites);
+        final Chip preselectionLikes = root.findViewById(R.id.chip_parks_favorites);
         final Chip preselectionLocation = root.findViewById(R.id.chip_parks_location);
         final Chip preselectionNearby = root.findViewById(R.id.chip_parks_nearby);
         final Chip preselectionTour = root.findViewById(R.id.chip_parks_tour);
@@ -96,15 +96,8 @@ public class ParksFragment extends Fragment {
         //textView.setText("---");
 
         parkNameFilter.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             public void afterTextChanged(Editable editable) {
                 parksViewModel.setParkNameFilter(editable.toString());
             }
@@ -138,7 +131,7 @@ public class ParksFragment extends Fragment {
                 // --- Preselection buttons ---
                 ParksFilterCriteria filterCriteria = parksData.filterCriteria;
                 ParksPreselection preselection = filterCriteria.preselection;
-                preselectionAll.setChecked(preselection == ParksPreselection.All);
+                preselectionLikes.setChecked(preselection == ParksPreselection.All);
                 preselectionLocation.setChecked(preselection == ParksPreselection.Location);
                 preselectionNearby.setChecked(preselection == ParksPreselection.Nearby);
                 preselectionTour.setChecked(preselection == ParksPreselection.Tour);
@@ -203,8 +196,17 @@ public class ParksFragment extends Fragment {
                 updateSpinnerAdapter(spinnerCountry, countries, countryFromModel);
                 updateSpinnerAdapter(spinnerCity, cities, cityFromModel);
 
+
+                //
+                String pnfText = parksData.filterCriteria.parkNameFilter;
+                if (!pnfText.equals(parkNameFilter.getText().toString())) {
+                    // Set text (only) when it has changed. This avoids one roundtrip.
+                    parkNameFilter.setText(pnfText);
+                }
+
                 // Park table
                 Context pctx = parksTable.getContext();
+                // Note: removeAllViews() can take several seconds, if there are many parks (1000+)
                 parksTable.removeAllViews();
 
                 List<Park> parksList = parksData.parks;
@@ -225,6 +227,19 @@ public class ParksFragment extends Fragment {
 
                     for (Park park : parksList) {
                         TableRow tr = new TableRow(pctx);
+/*
+                        {
+                            TableLayout.LayoutParams tableRowParams =
+                                    new TableLayout.LayoutParams
+                                            (TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                            int leftMargin = 10;
+                            int topMargin = 2;
+                            int rightMargin = 10;
+                            int bottomMargin = 2;
+                            tableRowParams.setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
+                            tr.setLayoutParams(tableRowParams);
+                        }
+*/
                         Context ctx = tr.getContext();
                         TextView parkName = new TextView(ctx);
                         parkName.setText(park.getName());
