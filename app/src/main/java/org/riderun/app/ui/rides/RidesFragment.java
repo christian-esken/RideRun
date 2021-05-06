@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -15,9 +16,11 @@ import org.riderun.app.R;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Park;
+import org.riderun.app.model.ParkUserData;
 import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
 import org.riderun.app.provider.ride.RidesProvider;
 
 import java.util.List;
@@ -36,6 +39,7 @@ public class RidesFragment extends Fragment {
 
     private RidesViewModel ridesViewModel;
     CityProvider cityProvider = ProviderFactory.cityProvider();
+    ParksUserDataProvider parksUserDataProvider = ProviderFactory.parksUserDataProvider();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +48,9 @@ public class RidesFragment extends Fragment {
         final TextView textView = root.findViewById(R.id.textView_location);
         final TextView countsView = root.findViewById(R.id.textViewCounts);
         final TableLayout rideTable = root.findViewById(R.id.rideTable);
+
+        final ImageButton likeButton = root.findViewById(R.id.park_like_button);
+
         rideTable.setBackgroundColor(Color.BLACK);
 
         ridesViewModel.ridesData().observe(getViewLifecycleOwner(), new Observer<RidesData>() {
@@ -51,6 +58,19 @@ public class RidesFragment extends Fragment {
             public void onChanged(@Nullable RidesData rd) {
                 Park park = rd.park;
                 textView.setText(park.getName() + " / " + cityProvider.byCityId(park.getCityId(), true));
+
+                ParkUserData parkUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                likeButton.setActivated(parkUserData.getLiked());
+
+                likeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        boolean activate = !likeButton.isActivated();
+                        ParkUserData parkUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                        parkUserData.setLiked(activate);
+                        likeButton.setActivated(activate);
+                    }
+                });
 
                 List<Ride> rides = rd.rides;
                 if (rides.isEmpty()) {

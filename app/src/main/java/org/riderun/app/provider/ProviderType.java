@@ -3,6 +3,9 @@ package org.riderun.app.provider;
 public enum ProviderType {
     // Visits of an Attraction. Taking a guided tour, Outside visit, roller coaster ride
     Count, // TODO Rename to Visit?
+    // Notes of the User about an Attraction, including a free text and a "liked" marker.
+    UserNotes,
+
     // An attraction at a Location, e.g. "Guided Tour" or "Taron" (roller coaster name)
     Attraction,
     /** A physical location, typically located in a city , e.g. "Tower Bridger", or "Phantasialand".

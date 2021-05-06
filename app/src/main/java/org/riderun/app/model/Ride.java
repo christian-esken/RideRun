@@ -1,6 +1,6 @@
 package org.riderun.app.model;
 
-public class Ride {
+public class Ride implements PrimaryKey<Integer> {
     private final String name;
     private final int rcdbRideId;
     private final int rcdbParkId;
@@ -33,8 +33,6 @@ public class Ride {
     public Ride(String name, int rcdbRideId, int rcdbParkId) {
         this(name, rcdbRideId, rcdbParkId, 1, "Steel", 105, "Flying", 93, "Operating", "", "2021");
     }
-
-
 
     // --- getters --------------------------
 
@@ -80,5 +78,11 @@ public class Ride {
 
     public String openedDate() {
         return openedDate;
+    }
+
+
+    @Override
+    public Integer pk() {
+        return rcdbId();
     }
 }

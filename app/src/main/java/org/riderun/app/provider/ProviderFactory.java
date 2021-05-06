@@ -9,6 +9,8 @@ import org.riderun.app.provider.country.CountryProvider;
 import org.riderun.app.provider.park.ParksProvider;
 import org.riderun.app.provider.park.mock.ParksMockProvider;
 import org.riderun.app.provider.park.rcdb.ParksRCDBProvider;
+import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
+import org.riderun.app.provider.parkuserdata.heap.ParksUserDataHeapProvider;
 import org.riderun.app.provider.ride.RidesProvider;
 import org.riderun.app.provider.ride.mock.RidesMockedProvider;
 import org.riderun.app.provider.ride.rcdb.RidesRCDBProvider;
@@ -51,6 +53,10 @@ public class ProviderFactory {
 
     public static CountProvider countProvider() {
         return MOCK ? RcdbCountProvider.instance() : RcdbCountProvider.instance(); // TODO MOCK provider
+    }
+
+    public static ParksUserDataProvider parksUserDataProvider() {
+        return MOCK ? ParksUserDataHeapProvider.instance() : ParksUserDataHeapProvider.instance(); // TODO real/persisting provider
     }
 
     /**

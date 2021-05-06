@@ -1,6 +1,6 @@
 package org.riderun.app.model;
 
-public class Park {
+public class Park implements PrimaryKey<Integer> {
     private final String name;
     private final int rcdbId;
     private final Integer cityId;
@@ -39,5 +39,10 @@ public class Park {
         return GeoCoordinate.empty();
         // TODO Move getGeoCoordinate to a helper method that goes through the geo hierarchy.
         //  -> geoCoordinate.isEmpty() ? city.getGeoCoordinate() : geoCoordinate;
+    }
+
+    @Override
+    public Integer pk() {
+        return rcdbId;
     }
 }
