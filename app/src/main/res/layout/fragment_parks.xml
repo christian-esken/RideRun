@@ -51,75 +51,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <TableLayout
+            android:id="@+id/preselection_geo"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TableLayout
-                android:id="@+id/preselection_geo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                <Spinner
+                    android:id="@+id/dd_preselection_continent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/geo_continent" />
 
-                    <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/geo_continent" />
+            </TableRow>
 
-                    <Spinner
-                        android:id="@+id/dd_preselection_continent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                </TableRow>
+                <Spinner
+                    android:id="@+id/dd_preselection_country"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/geo_country" />
 
-                    <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/geo_country" />
+            </TableRow>
 
-                    <Spinner
-                        android:id="@+id/dd_preselection_country"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                </TableRow>
+                <Spinner
+                    android:id="@+id/dd_preselection_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/geo_city" />
 
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/geo_city" />
+            </TableRow>
 
-                    <Spinner
-                        android:id="@+id/dd_preselection_city"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                </TableRow>
-
-            </TableLayout>
-
-        </LinearLayout>
+        </TableLayout>
 
     </FrameLayout>
 

@@ -3,11 +3,13 @@ package org.riderun.app.ui.parks;
 import org.riderun.app.model.City;
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
+import org.riderun.app.model.ParkUserData;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.config.ConfigDefaultsProvider;
 import org.riderun.app.provider.config.ConfigProvider;
 import org.riderun.app.provider.park.ParksProvider;
+import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
 import org.riderun.app.provider.ride.RidesProvider;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class ParksViewModel extends ViewModel {
     private final static int LIMIT = 50;
     private final MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
     private final ParksProvider parksProvider;
+    private final ParksUserDataProvider parksUserDataProvider = ProviderFactory.parksUserDataProvider();
     private final CityProvider cityProvider;
     private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
 
@@ -34,12 +37,14 @@ public class ParksViewModel extends ViewModel {
 
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
-        ParksFilterCriteria filterCriteria = new ParksFilterCriteria.Builder()
+        ParksFilterCriteria filterCriteria = ParksFilterCriteria.Builder.builder()
                 .preselection(config.parkPreselection())
                 .geoCoordinate(config.geoCoordinate())
                 .orderBy(config.orderBy())
                 .orderDirection(config.orderDirection())
-                .limit(config.parkLimit()).build();
+                .limit(config.parkLimit())
+                .modificationHint(ParksFilterCriteria.ModificationHint.All)
+                .build();
         ParksData appliedFilter = applyFilter(filterCriteria, parksProvider);
         liveParksData.setValue(appliedFilter);
     }
@@ -64,8 +69,15 @@ public class ParksViewModel extends ViewModel {
         // PRESELECTION : TODO Implement the other preselection methods (currently always: ALL)
         final List<Park> parkList;
         switch (criteria.preselection) {
-            case All:
-                parkList = parkprovider.all();
+            case Likes:
+                parkList = new ArrayList<>();
+                for (Park park : parkprovider.all()) {
+                    ParkUserData pud = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                    if(pud != null && pud.getLiked()) {
+                        parkList.add(park);
+                    }
+                }
+
                 break;
             case Location:
                 parkList = new ArrayList<>();
@@ -142,6 +154,11 @@ public class ParksViewModel extends ViewModel {
         List<Park> parksLimited = parksMatching.subList(0, Math.min(limit, parksMatching.size()));
 
         return new ParksData(criteria, parksLimited, parksMatching);
+    }
+
+
+    public void setPreselection(ParksPreselection preselection) {
+        postModifiedFilter(fc().preselection(preselection));
     }
 
     public void setParkNameFilter(String parkName) {

@@ -86,6 +86,13 @@ public class ParksFragment extends Fragment {
         final Chip preselectionNearby = root.findViewById(R.id.chip_parks_nearby);
         final Chip preselectionTour = root.findViewById(R.id.chip_parks_tour);
 
+        preselectionLikes.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Likes));
+        preselectionLocation.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Location));
+        preselectionNearby.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Nearby));
+        preselectionTour.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Tour));
+
+
+        View preselectionGeo = root.findViewById(R.id.preselection_geo);
         final Spinner spinnerContinent = root.findViewById(R.id.dd_preselection_continent);
         final Spinner spinnerCountry = root.findViewById(R.id.dd_preselection_country);
         final Spinner spinnerCity = root.findViewById(R.id.dd_preselection_city);
@@ -131,70 +138,24 @@ public class ParksFragment extends Fragment {
                 // --- Preselection buttons ---
                 ParksFilterCriteria filterCriteria = parksData.filterCriteria;
                 ParksPreselection preselection = filterCriteria.preselection;
-                preselectionLikes.setChecked(preselection == ParksPreselection.All);
-                preselectionLocation.setChecked(preselection == ParksPreselection.Location);
+                preselectionLikes.setChecked(preselection == ParksPreselection.Likes);
+                boolean psByLocation = preselection == ParksPreselection.Location;
+                preselectionLocation.setChecked(psByLocation);
                 preselectionNearby.setChecked(preselection == ParksPreselection.Nearby);
                 preselectionTour.setChecked(preselection == ParksPreselection.Tour);
 
                 // Preselection specific filter criteria
+                preselectionGeo.setVisibility(psByLocation ? View.VISIBLE : View.INVISIBLE);
 
-                // Preselection specific filter criteria: Location (continent, country, city)
-                SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
-                SortedSet<Country> countries = new TreeSet<>(Country.orderByCountryName(Order.ASC));
 
-                Country countryFromModel = null;
-                City cityFromModel = null;
-
-                GeoLevel geoLevel = null;
-                {   // Opening a block solely to limit variable scope
-                    // Create the pre-Selected city list from location filter
-                    Integer locationCityId = filterCriteria.locationCityId;
-                    Map<Integer, City> cityIdMap = new HashMap<>();
-                    if (locationCityId != null) {
-                        cityFromModel = cityProvider.byCityId(locationCityId, false);
-                        if (cityFromModel != null) {
-                            cityIdMap.put(cityFromModel.getCityId(), cityFromModel);
-                            countryFromModel = countryProvider.countryBy2letterCC(cityFromModel.getCountry2letter());
-                            geoLevel = GeoLevel.City;
-                        }
-                    }
-                    if (geoLevel == null) {
-                        // No city given. lets check if we have a country filter
-                        String cc = filterCriteria.locationCountryCode2letter;
-                        if (cc != null && !cc.equals(SPINNER_DEFAULT_ALL)) {
-                            countryFromModel = countryProvider.countryBy2letterCC(cc);
-                            List<City> citiesMatchingCC = cityProvider.byCountryCode(cc);
-                            citiesMatchingCC.forEach(city -> cityIdMap.put(city.getCityId(), city));
-                            if (!citiesMatchingCC.isEmpty()) {
-                                geoLevel = GeoLevel.Country;
-                            }
-                        }
-                    }
-                    // TODO Continent matching
-                    if (geoLevel == null) {
-                        cityProvider.cities().forEach(city -> cityIdMap.put(city.getCityId(), city));
-                        geoLevel = GeoLevel.World;
-                    }
-
-                    for (City city : cityIdMap.values()) {
-                        cities.add(city);
-                        Country country = countryProvider.countryBy2letterCC(city.getCountry2letter());
-                        if (country != null) {
-                            countries.add(country);
-                        }
-                    }
+                switch (preselection) {
+                    case Location:
+                        preselectByLocation(filterCriteria, spinnerContinent, spinnerCountry, spinnerCity);
+                        break;
+                    case Likes:
+                        preselectByLikes(filterCriteria);
+                        break;
                 }
-                // TODO Continents should be derived from the country, but we do not have a
-                //      CountryProvider yet.
-                List<Continent> continents = Continent.allContinents();
-
-                updateSpinnerAdapter(spinnerContinent, continents, filterCriteria.locationContinent);
-                // Selecting by country name is not 100% correct. If there are 2 identically named entries,
-                // a direct selection by ID will be required. For now we don't have this. It may be
-                // required to fix this later, expecially for other spinners (e.g. city spinner).
-                //String countrySelection = countryFromModel == null ? null : countryFromModel.countryName;
-                updateSpinnerAdapter(spinnerCountry, countries, countryFromModel);
-                updateSpinnerAdapter(spinnerCity, cities, cityFromModel);
 
 
                 //
@@ -288,6 +249,70 @@ public class ParksFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void preselectByLikes(ParksFilterCriteria filterCriteria) {
+
+    }
+
+    private void preselectByLocation(ParksFilterCriteria filterCriteria, Spinner spinnerContinent, Spinner spinnerCountry, Spinner spinnerCity) {
+        // Preselection specific filter criteria: Location (continent, country, city)
+        SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
+        SortedSet<Country> countries = new TreeSet<>(Country.orderByCountryName(Order.ASC));
+
+        Country countryFromModel = null;
+        City cityFromModel = null;
+
+        GeoLevel geoLevel = null;
+        {   // Opening a block solely to limit variable scope
+            // Create the pre-Selected city list from location filter
+            Integer locationCityId = filterCriteria.locationCityId;
+            Map<Integer, City> cityIdMap = new HashMap<>();
+            if (locationCityId != null) {
+                cityFromModel = cityProvider.byCityId(locationCityId, false);
+                if (cityFromModel != null) {
+                    cityIdMap.put(cityFromModel.getCityId(), cityFromModel);
+                    countryFromModel = countryProvider.countryBy2letterCC(cityFromModel.getCountry2letter());
+                    geoLevel = GeoLevel.City;
+                }
+            }
+            if (geoLevel == null) {
+                // No city given. lets check if we have a country filter
+                String cc = filterCriteria.locationCountryCode2letter;
+                if (cc != null && !cc.equals(SPINNER_DEFAULT_ALL)) {
+                    countryFromModel = countryProvider.countryBy2letterCC(cc);
+                    List<City> citiesMatchingCC = cityProvider.byCountryCode(cc);
+                    citiesMatchingCC.forEach(city -> cityIdMap.put(city.getCityId(), city));
+                    if (!citiesMatchingCC.isEmpty()) {
+                        geoLevel = GeoLevel.Country;
+                    }
+                }
+            }
+            // TODO Continent matching
+            if (geoLevel == null) {
+                cityProvider.cities().forEach(city -> cityIdMap.put(city.getCityId(), city));
+                geoLevel = GeoLevel.World;
+            }
+
+            for (City city : cityIdMap.values()) {
+                cities.add(city);
+                Country country = countryProvider.countryBy2letterCC(city.getCountry2letter());
+                if (country != null) {
+                    countries.add(country);
+                }
+            }
+        }
+        // TODO Continents should be derived from the country, but we do not have a
+        //      CountryProvider yet.
+        List<Continent> continents = Continent.allContinents();
+
+        updateSpinnerAdapter(spinnerContinent, continents, filterCriteria.locationContinent);
+        // Selecting by country name is not 100% correct. If there are 2 identically named entries,
+        // a direct selection by ID will be required. For now we don't have this. It may be
+        // required to fix this later, expecially for other spinners (e.g. city spinner).
+        //String countrySelection = countryFromModel == null ? null : countryFromModel.countryName;
+        updateSpinnerAdapter(spinnerCountry, countries, countryFromModel);
+        updateSpinnerAdapter(spinnerCity, cities, cityFromModel);
     }
 
     private TextView addTextcolToRow(Context pctx, TableRow th, String text, OrderBy orderBy, ParksViewModel pvm) {

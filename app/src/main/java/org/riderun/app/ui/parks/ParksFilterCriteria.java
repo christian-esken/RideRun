@@ -6,6 +6,9 @@ import org.riderun.app.storage.Order;
 import java.util.Objects;
 
 public class ParksFilterCriteria {
+    // A hint what field was modified
+    final ModificationHint modificationHint;
+
     // Preselection
     final ParksPreselection preselection;
     // Data from all the preselection filter. We store all of them, so the data
@@ -33,8 +36,47 @@ public class ParksFilterCriteria {
     // LIMIT: Maximum number of parks to show
     final int limit;
 
+    // Filter type. Used as a "Modification hint"
+    public enum ModificationHint {
+        Unmodified,
+        All, // If the config is new
+        PreselType,
+        PreselCriteriaContinent,
+        PreselCriteriaCountry,
+        PreselCriteriaCity,
+        PreselGeoCoordinate,
+        PreselCriteriaTourName,
+        ParkName,
+        OrderByOrLimit;
+
+        /**
+         * Returns if this modification hint contains the given one. this.contains(this) is always
+         * true. And ALL.contains(non-null-value) is also always true.
+         * <br> The use case for this is to check whehter an announced change (e.g. PreselType) has
+         * an effect on a certain GUI element. For example, a Country change has an effect on the city
+         * Spinner, which should now only show cities matching the new country.
+         *
+         * @param modificationHint the hint to compare
+         * @return true if this is contained
+         */
+        boolean contains(ModificationHint modificationHint) {
+            if (this == modificationHint) {
+                return true;
+            }
+            if (modificationHint == null) {
+                return false;
+            }
+            if (this == All) {
+                return true;
+            }
+            // Two different criterias. Not contained in each other
+            return false;
+        }
+    }
+
     // This constructor will get very many parameters. Possibly change to Builder pattern
-    private ParksFilterCriteria(ParksPreselection preselection,
+    private ParksFilterCriteria(ModificationHint modificationHint,
+                                ParksPreselection preselection,
                                 GeoCoordinate geoCoordinate,
                                 String locationContinent,
                                 String locationCountryCode2letter,
@@ -44,6 +86,7 @@ public class ParksFilterCriteria {
                                 OrderBy orderBy,
                                 Order orderDirection,
                                 int limit) {
+        this.modificationHint = modificationHint;
         this.preselection = preselection;
         this.geoCoordinate = geoCoordinate;
         this.locationContinent = locationContinent;
@@ -88,7 +131,9 @@ public class ParksFilterCriteria {
     }
 
     public static class Builder {
-        ParksPreselection preselection = ParksPreselection.All;
+        ModificationHint modificationHint = ModificationHint.Unmodified;
+
+        ParksPreselection preselection = ParksPreselection.Likes;
 
         GeoCoordinate geoCoordinate = GeoCoordinate.empty();
         String locationContinent;
@@ -105,6 +150,11 @@ public class ParksFilterCriteria {
         // LIMIT
         int limit = 50;
 
+        /**
+         * Use {@link Builder#build()} instead
+         */
+        private Builder() {
+        }
 
         /**
          * Creates a builder with default values
@@ -136,7 +186,9 @@ public class ParksFilterCriteria {
         }
 
         public ParksFilterCriteria build() {
-            return new ParksFilterCriteria(preselection,
+            return new ParksFilterCriteria(
+                    modificationHint,
+                    preselection,
                     geoCoordinate,
                     locationContinent,
                     locationCountryCode2letter,
@@ -151,46 +203,67 @@ public class ParksFilterCriteria {
 
         public Builder preselection(ParksPreselection preselection) {
             this.preselection = preselection;
+            this.modificationHint = ModificationHint.PreselType;
             return this;
         }
 
         public Builder geoCoordinate(GeoCoordinate geoCoordinate) {
             this.geoCoordinate = geoCoordinate;
+            this.modificationHint = ModificationHint.PreselGeoCoordinate;
             return this;
         }
 
         public Builder locationContinent(String locationContinent) {
             this.locationContinent = locationContinent;
+            this.modificationHint = ModificationHint.PreselCriteriaContinent;
             return this;
         }
 
         public Builder locationCountryCode2letter(String locationCountryCode2letter) {
             this.locationCountryCode2letter = locationCountryCode2letter;
+            this.modificationHint = ModificationHint.PreselCriteriaCountry;
             return this;
         }
 
         public Builder locationCityId(Integer locationCityId) {
             this.locationCityId = locationCityId;
+            this.modificationHint = ModificationHint.PreselCriteriaCity;
             return this;
         }
 
         public Builder tourName(String tourName) {
             this.tourName = tourName;
+            this.modificationHint = ModificationHint.PreselCriteriaTourName;
             return this;
         }
 
         public Builder nameFilter(String nameFilter) {
             this.nameFilter = nameFilter;
+            this.modificationHint = ModificationHint.ParkName;
             return this;
         }
 
         public Builder orderBy(OrderBy orderBy) {
             this.orderBy = orderBy;
+            this.modificationHint = ModificationHint.OrderByOrLimit;
             return this;
         }
 
         public Builder orderDirection(Order orderDirection) {
             this.orderDirection = orderDirection;
+            this.modificationHint = ModificationHint.OrderByOrLimit;
+            return this;
+        }
+
+        /**
+         * Call this to override automatic ModificationHint. There is no need to call
+         * this after modifying just a single field of this Builder.
+         * Typically one would call this with the "All" as argument.
+         * @param modificationHint the hint
+         * @return This Builder
+         */
+        public Builder modificationHint(ModificationHint modificationHint) {
+            this.modificationHint = modificationHint;
             return this;
         }
 
