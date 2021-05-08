@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
@@ -30,6 +29,11 @@
             android:layout_weight="0"
             android:src="@android:drawable/btn_star" />
 
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
         <TextView
             android:id="@+id/textView_location"
             android:layout_width="wrap_content"
@@ -43,6 +47,11 @@
             android:autoSizeMaxTextSize="32dp"
             android:autoSizeTextType="uniform"
             android:textAlignment="center" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
 
         <TextView
             android:id="@+id/textViewCounts"
@@ -63,15 +72,6 @@
         android:orientation="horizontal">
 
         <ToggleButton
-            android:id="@+id/qfOwnRides"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="ToggleButton"
-            android:textOff="ALL"
-            android:textOn="OWN" />
-
-        <ToggleButton
             android:id="@+id/qfOpenCounts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,15 +80,20 @@
             android:textOff="ALL"
             android:textOn="OPEN" />
 
-        <EditText
-            android:id="@+id/qfRideName"
+        <Button
+            android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:autofillHints=""
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="RCDB" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Queue Times" />
+
     </LinearLayout>
 
     <ScrollView
