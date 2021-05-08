@@ -8,7 +8,7 @@ import org.riderun.app.ui.parks.ParksPreselection;
 public class ConfigDefaultsProvider implements ConfigProvider {
     @Override
     public int parkLimit() {
-        return 1000;
+        return 200;
     }
 
     @Override

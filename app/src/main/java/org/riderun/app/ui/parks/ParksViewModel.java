@@ -102,9 +102,9 @@ public class ParksViewModel extends ViewModel {
                 // TODO Also implement city and continent preselection
                 break;
             case Tour:
-                throw new UnsupportedOperationException("Tour not yet implemented");
+                //throw new UnsupportedOperationException("Tour not yet implemented");
             case Nearby:
-                throw new UnsupportedOperationException("Nearby not yet implemented");
+                //throw new UnsupportedOperationException("Nearby not yet implemented");
             default:
                 // TODO Log warning
                 parkList = parkprovider.all();
