@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -227,7 +228,7 @@ public class ParksFragment extends Fragment {
                         TextView rideCountText = new TextView(ctx);
                         List<Ride> rides = ridesProvider.ridesForPark(park.getRcdbId());
                         rideCountText.setText(Integer.toString(rides.size()));
-
+                        rideCountText.setGravity(Gravity.CENTER);
 
                         TextView cityName = new TextView(ctx);
                         City city = cityProvider.byCityId(park.getCityId(), true);
