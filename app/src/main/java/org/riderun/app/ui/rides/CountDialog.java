@@ -7,6 +7,7 @@ import android.os.Bundle;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Ride;
+import org.riderun.app.provider.count.CountProvider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,12 +16,14 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 public class CountDialog extends AppCompatDialogFragment {
     private final Ride ride;
     private final Count count;
+    private final CountProvider countProvider;
     private final RidesViewModel ridesViewModel;
 
-    public CountDialog(Ride ride, Count count, RidesViewModel ridesViewModel) {
+    public CountDialog(Ride ride, Count count, CountProvider countProvider, RidesViewModel ridesViewModel) {
         super();
         this.ride = ride;
         this.count = count;
+        this.countProvider = countProvider;
         this.ridesViewModel = ridesViewModel;
     }
 
@@ -42,12 +45,12 @@ public class CountDialog extends AppCompatDialogFragment {
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
             if (actionIsRemove) {
                 count.removeCount(count.getLastEntry());
-                ridesViewModel.notifyCountChange(ride, count);
+                ridesViewModel.notifyCountChange(ride, count, countProvider);
             } else {
                 // TODO Add comment field in GUI, for optional comments
                 Count countToUpdate = count == null ? new Count() : count;
                 countToUpdate.addCountNow(null);
-                ridesViewModel.notifyCountChange(ride, countToUpdate);
+                ridesViewModel.notifyCountChange(ride, countToUpdate, countProvider);
             }
         });
         builder.setNegativeButton("Cancel", (a,b) -> {} );

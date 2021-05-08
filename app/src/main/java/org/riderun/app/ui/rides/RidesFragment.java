@@ -18,10 +18,11 @@ import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.ParkUserData;
 import org.riderun.app.model.Ride;
+import org.riderun.app.provider.ProviderBundle;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
+import org.riderun.app.provider.count.CountProvider;
 import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
-import org.riderun.app.provider.ride.RidesProvider;
 
 import java.util.List;
 
@@ -36,13 +37,11 @@ import androidx.lifecycle.ViewModelProvider;
  * The rides table shows for each ride if it was counted and allows to count it.
  */
 public class RidesFragment extends Fragment {
-
     private RidesViewModel ridesViewModel;
-    CityProvider cityProvider = ProviderFactory.cityProvider();
-    ParksUserDataProvider parksUserDataProvider = ProviderFactory.parksUserDataProvider();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        final ProviderBundle providerBundle = ProviderFactory.get(ProviderFactory.Bundle.RCDB);
         ridesViewModel = new ViewModelProvider(this.getActivity()).get(RidesViewModel.class);
         View root = inflater.inflate(R.layout.fragment_rides, container, false);
         final TextView textView = root.findViewById(R.id.textView_location);
@@ -57,6 +56,8 @@ public class RidesFragment extends Fragment {
             @Override
             public void onChanged(@Nullable RidesData rd) {
                 Park park = rd.park;
+                CityProvider cityProvider = providerBundle.cityProvider();
+                ParksUserDataProvider parksUserDataProvider = providerBundle.siteUserDataProvider();
                 textView.setText(park.getName() + " / " + cityProvider.byCityId(park.getCityId(), true));
 
                 ParkUserData parkUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
@@ -95,6 +96,7 @@ public class RidesFragment extends Fragment {
                 th.addView(thCount);
                 rideTable.addView(th);
 
+                CountProvider countProvider = providerBundle.countProvider();
                 for (Ride ride : rides) {
                     TableRow tr = new TableRow(ctx);
                     tr.setBackgroundColor(Color.WHITE);
@@ -116,7 +118,7 @@ public class RidesFragment extends Fragment {
                         countButton = button;
                     }
 
-                    countButton.setOnClickListener(view -> openDialog(view, count, ride));
+                    countButton.setOnClickListener(view -> openDialog(view, count, countProvider, ride));
 
                     TextView tv1 = new TextView(ctx);
                     tv1.setText(ride.name());
@@ -130,8 +132,8 @@ public class RidesFragment extends Fragment {
         return root;
     }
 
-    private void openDialog(View view, Count count, Ride ride) {
-        CountDialog dialog = new CountDialog(ride, count, ridesViewModel);
+    private void openDialog(View view, Count count, CountProvider countProvider, Ride ride) {
+        CountDialog dialog = new CountDialog(ride, count, countProvider, ridesViewModel);
         dialog.show(this.getParentFragmentManager(), "info");
     }
 }

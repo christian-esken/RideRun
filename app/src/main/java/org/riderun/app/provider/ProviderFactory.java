@@ -1,19 +1,7 @@
 package org.riderun.app.provider;
 
-import org.riderun.app.provider.city.CityProvider;
-import org.riderun.app.provider.city.mock.CityMockProvider;
-import org.riderun.app.provider.city.rcdb.CityRCDBProvider;
-import org.riderun.app.provider.count.CountProvider;
-import org.riderun.app.provider.count.db.RcdbCountProvider;
-import org.riderun.app.provider.country.CountryProvider;
-import org.riderun.app.provider.park.ParksProvider;
-import org.riderun.app.provider.park.mock.ParksMockProvider;
-import org.riderun.app.provider.park.rcdb.ParksRCDBProvider;
-import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
-import org.riderun.app.provider.parkuserdata.heap.ParksUserDataHeapProvider;
-import org.riderun.app.provider.ride.RidesProvider;
-import org.riderun.app.provider.ride.mock.RidesMockedProvider;
-import org.riderun.app.provider.ride.rcdb.RidesRCDBProvider;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -33,35 +21,18 @@ import org.riderun.app.provider.ride.rcdb.RidesRCDBProvider;
  * providers at the same time, e.g. to show all POI's in Finland.
  */
 public class ProviderFactory {
-    private final static boolean MOCK = false;
+    private final static boolean USE_MOCK = false;
+    private final static Map<Bundle, ProviderBundle> providerBundles = new HashMap<>();
 
-    public static ParksProvider parksProvider() {
-        return MOCK ? ParksMockProvider.instance() : ParksRCDBProvider.instance();
+    public enum Bundle {RCDB, MOCK};
+
+    static {
+        providerBundles.put(Bundle.MOCK, new MockProviderBundle());
+        providerBundles.put(Bundle.RCDB, new RcdbProviderBundle());
     }
 
-    public static RidesProvider ridesProvider() {
-        return MOCK ? RidesMockedProvider.instance() : RidesRCDBProvider.instance();
+    public static ProviderBundle get(Bundle bundle) {
+        return USE_MOCK ? providerBundles.get(Bundle.MOCK) : providerBundles.get(bundle);
     }
 
-    public static CountryProvider countryProvider() {
-        return MOCK ? CityRCDBProvider.instance() : CityRCDBProvider.instance(); // TODO mock provider
-    }
-
-    public static CityProvider cityProvider() {
-        return MOCK ? CityMockProvider.instance() : CityRCDBProvider.instance();
-    }
-
-    public static CountProvider countProvider() {
-        return MOCK ? RcdbCountProvider.instance() : RcdbCountProvider.instance(); // TODO MOCK provider
-    }
-
-    public static ParksUserDataProvider parksUserDataProvider() {
-        return MOCK ? ParksUserDataHeapProvider.instance() : ParksUserDataHeapProvider.instance(); // TODO real/persisting provider
-    }
-
-    /**
-     * Returns whether the mock mode is active
-     * @return true if the data is mocked
-     */
-    public static boolean useMockData() { return MOCK; }
 }

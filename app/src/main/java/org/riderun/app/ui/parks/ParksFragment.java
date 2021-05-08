@@ -28,6 +28,7 @@ import org.riderun.app.model.Country;
 import org.riderun.app.model.GeoPrecision;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.Ride;
+import org.riderun.app.provider.ProviderBundle;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.count.CountProvider;
@@ -61,21 +62,15 @@ import androidx.lifecycle.ViewModelProvider;
 public class ParksFragment extends Fragment {
 
     static final String SPINNER_DEFAULT_ALL = "All";
-    ParksProvider parksProvider;
-    CityProvider cityProvider;
-    CountryProvider countryProvider;
-    private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
-    private final CountProvider countProvider = ProviderFactory.countProvider();
 
 
     // Note onCreateView looks up the UI elements, install listeners and starts observing the
     // view model.
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
-        parksProvider = ProviderFactory.parksProvider();
-        cityProvider = ProviderFactory.cityProvider();
-        countryProvider = ProviderFactory.countryProvider();
+        final ProviderBundle providerBundle = ProviderFactory.get(ProviderFactory.Bundle.RCDB);
+        final RidesProvider ridesProvider = providerBundle.attractionProvider();
+        CityProvider cityProvider = providerBundle.cityProvider();
 
         // We retrieve a reference to the RidesViewModel, so we can select a new park
         RidesViewModel ridesViewModel = new ViewModelProvider(this.getActivity()).get(RidesViewModel.class);;
@@ -87,10 +82,10 @@ public class ParksFragment extends Fragment {
         final Chip preselectionNearby = root.findViewById(R.id.chip_parks_nearby);
         final Chip preselectionTour = root.findViewById(R.id.chip_parks_tour);
 
-        preselectionLikes.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Likes));
-        preselectionLocation.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Location));
-        preselectionNearby.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Nearby));
-        preselectionTour.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Tour));
+        preselectionLikes.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Likes, providerBundle));
+        preselectionLocation.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Location, providerBundle));
+        preselectionNearby.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Nearby, providerBundle));
+        preselectionTour.setOnClickListener(v -> parksViewModel.setPreselection(ParksPreselection.Tour, providerBundle));
 
 
         View preselectionGeo = root.findViewById(R.id.preselection_geo);
@@ -107,25 +102,25 @@ public class ParksFragment extends Fragment {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             public void afterTextChanged(Editable editable) {
-                parksViewModel.setParkNameFilter(editable.toString());
+                parksViewModel.setParkNameFilter(editable.toString(), providerBundle);
             }
         });
 
         spinnerContinent.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
-            void set(Object newValue) { parksViewModel.setLocationContinent((String)newValue); }
+            void set(Object newValue) { parksViewModel.setLocationContinent((String)newValue, providerBundle); }
         });
 
         spinnerCountry.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
-            void set(Object newValue) { parksViewModel.setLocationCountry((String)newValue); }
+            void set(Object newValue) { parksViewModel.setLocationCountry((String)newValue, providerBundle); }
         });
 
         spinnerCity.setOnItemSelectedListener(new GeoSpinnerOnItemSelectedListener() {
             void set(Object newValue) {
                 if (newValue == null || newValue instanceof String) {
                     // SHOULD be the "ALL" selection
-                    parksViewModel.setLocationCityId(null);
+                    parksViewModel.setLocationCityId(null, providerBundle);
                 } else {
-                    parksViewModel.setLocationCityId(((City)newValue).getCityId());
+                    parksViewModel.setLocationCityId(((City)newValue).getCityId(), providerBundle);
                 }
             }
         });
@@ -151,7 +146,7 @@ public class ParksFragment extends Fragment {
 
                 switch (preselection) {
                     case Location:
-                        preselectByLocation(filterCriteria, spinnerContinent, spinnerCountry, spinnerCity);
+                        preselectByLocation(filterCriteria, providerBundle, spinnerContinent, spinnerCountry, spinnerCity);
                         break;
                     case Likes:
                         preselectByLikes(filterCriteria);
@@ -180,9 +175,9 @@ public class ParksFragment extends Fragment {
                 } else {
                     TableRow th = new TableRow(pctx);
                     th.setBackgroundColor(Color.LTGRAY);
-                    addTextcolToRow(pctx, th, "Park", OrderBy.Name, parksViewModel);
-                    addTextcolToRow(pctx, th, "Count", OrderBy.AttractionCount, parksViewModel);
-                    addTextcolToRow(pctx, th, "Location", OrderBy.Distance, parksViewModel);
+                    addTextcolToRow(pctx, th, "Park", OrderBy.Name, parksViewModel, providerBundle);
+                    addTextcolToRow(pctx, th, "Count", OrderBy.AttractionCount, parksViewModel, providerBundle);
+                    addTextcolToRow(pctx, th, "Location", OrderBy.Distance, parksViewModel, providerBundle);
                     parksTable.addView(th);
 
 
@@ -209,11 +204,13 @@ public class ParksFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 TextView tv = (TextView)v;
+                                ParksProvider parksProvider = providerBundle.siteProvider();
                                 List<Park> parks = parksProvider.byName(tv.getText().toString(), 1);
                                 if (!parks.isEmpty()) {
                                     Park park = parks.get(0);
                                     List<Ride> rides = ridesProvider.ridesForPark(park.getRcdbId());
                                     Map<PoiKey, Count> counts = new HashMap<>();
+                                    final CountProvider countProvider = providerBundle.countProvider();
                                     for (Ride ride : rides) {
                                         counts.putAll(countProvider.getByPoiKey(Integer.toString(ride.rcdbId())));
                                     }
@@ -256,13 +253,16 @@ public class ParksFragment extends Fragment {
 
     }
 
-    private void preselectByLocation(ParksFilterCriteria filterCriteria, Spinner spinnerContinent, Spinner spinnerCountry, Spinner spinnerCity) {
+    private void preselectByLocation(ParksFilterCriteria filterCriteria, ProviderBundle providerBundle, Spinner spinnerContinent, Spinner spinnerCountry, Spinner spinnerCity) {
         // Preselection specific filter criteria: Location (continent, country, city)
         SortedSet<City> cities = new TreeSet<>(City.orderByName(Order.ASC));
         SortedSet<Country> countries = new TreeSet<>(Country.orderByCountryName(Order.ASC));
 
         Country countryFromModel = null;
         City cityFromModel = null;
+
+        CityProvider cityProvider = providerBundle.cityProvider();
+        CountryProvider countryProvider = providerBundle.countryProvider();
 
         GeoLevel geoLevel = null;
         {   // Opening a block solely to limit variable scope
@@ -316,14 +316,14 @@ public class ParksFragment extends Fragment {
         updateSpinnerAdapter(spinnerCity, cities, cityFromModel);
     }
 
-    private TextView addTextcolToRow(Context pctx, TableRow th, String text, OrderBy orderBy, ParksViewModel pvm) {
+    private TextView addTextcolToRow(Context pctx, TableRow th, String text, OrderBy orderBy, ParksViewModel pvm, ProviderBundle providerBundle) {
         TextView textView = new TextView(pctx);
         textView.setText(text);
         th.addView(textView);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pvm.setNewOrder(orderBy);
+                pvm.setNewOrder(orderBy, providerBundle);
             }
         });
         return textView;

@@ -4,6 +4,7 @@ import org.riderun.app.model.City;
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
 import org.riderun.app.model.ParkUserData;
+import org.riderun.app.provider.ProviderBundle;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.config.ConfigDefaultsProvider;
@@ -23,17 +24,10 @@ import androidx.lifecycle.ViewModel;
  * Business logic for the ParksFragment. Any modification of ParksData must go through this class
  */
 public class ParksViewModel extends ViewModel {
-    private final static int LIMIT = 50;
     private final MutableLiveData<ParksData> liveParksData = new MutableLiveData<>();
-    private final ParksProvider parksProvider;
-    private final ParksUserDataProvider parksUserDataProvider = ProviderFactory.parksUserDataProvider();
-    private final CityProvider cityProvider;
-    private final RidesProvider ridesProvider = ProviderFactory.ridesProvider();
 
     public ParksViewModel() {
-        // Set providers
-        parksProvider = ProviderFactory.parksProvider();
-        cityProvider = ProviderFactory.cityProvider();
+        final ProviderBundle providerBundle = ProviderFactory.get(ProviderFactory.Bundle.RCDB);
 
         // Note: For now use the ConfigDefaultsProvider. Later we should pick it from the user config.
         ConfigProvider config = new ConfigDefaultsProvider();
@@ -45,7 +39,7 @@ public class ParksViewModel extends ViewModel {
                 .limit(config.parkLimit())
                 .modificationHint(ParksFilterCriteria.ModificationHint.All)
                 .build();
-        ParksData appliedFilter = applyFilter(filterCriteria, parksProvider);
+        ParksData appliedFilter = applyFilter(filterCriteria, providerBundle);
         liveParksData.setValue(appliedFilter);
     }
 
@@ -55,22 +49,22 @@ public class ParksViewModel extends ViewModel {
      *
      * Filters the Parks from the parkprovider
      * @param criteria Filter, Sort and Limit criteria, and the park list
-     * @param parkprovider The list of parks to take into account. It can be all parks, or a
-     *                     limited list, e.g. the parks from aq given Country of Tour.
+     * @param providerBundle The provider
      * @return The matching, filtered and sorted Parks
      */
-    private ParksData applyFilter(ParksFilterCriteria criteria, ParksProvider parkprovider) {
+    private ParksData applyFilter(ParksFilterCriteria criteria, ProviderBundle providerBundle) {
         String nameFilter = criteria.parkNameFilter.toLowerCase();
         boolean hasNameFilter = !nameFilter.trim().isEmpty();
-        boolean hasFilter = hasNameFilter; // currently there is only one filter
         GeoCoordinate geo = criteria.geoCoordinate;
 
         int limit = criteria.limit;
         // PRESELECTION : TODO Implement the other preselection methods (currently always: ALL)
+        ParksProvider parkprovider = providerBundle.siteProvider();
         final List<Park> parkList;
         switch (criteria.preselection) {
             case Likes:
                 parkList = new ArrayList<>();
+                final ParksUserDataProvider parksUserDataProvider = providerBundle.siteUserDataProvider();
                 for (Park park : parkprovider.all()) {
                     ParkUserData pud = parksUserDataProvider.byRcdbId(park.getRcdbId());
                     if(pud != null && pud.getLiked()) {
@@ -80,6 +74,7 @@ public class ParksViewModel extends ViewModel {
 
                 break;
             case Location:
+                CityProvider cityProvider = providerBundle.cityProvider();
                 parkList = new ArrayList<>();
                 String cc = criteria.locationCountryCode2letter;
                 Integer cityId = criteria.locationCityId;
@@ -113,9 +108,9 @@ public class ParksViewModel extends ViewModel {
         List<Park> parksMatching = new ArrayList<>(parkList.size());
 
         // WHERE
-        if (hasFilter) {
+        if (hasNameFilter) {
             for (Park park : parkList) {
-                if (hasNameFilter && park.getName().toLowerCase().contains(nameFilter)) {
+                if (park.getName().toLowerCase().contains(nameFilter)) {
                     parksMatching.add(park);
                 }
             }
@@ -126,12 +121,14 @@ public class ParksViewModel extends ViewModel {
         // ORDER BY
         OrderBy orderBy = criteria.orderBy;
         int orderMultiplier = criteria.orderDirection.multiplier();
+        final RidesProvider ridesProvider = providerBundle.attractionProvider();
+
         switch (orderBy) {
             case Distance:
                 parksMatching.sort( (a,b) -> {
                     double distanceA = a.getGeoCoordinate().sortingDistance(geo);
                     double distanceB = b.getGeoCoordinate().sortingDistance(geo);
-                    int order = distanceA < distanceB ? -1 : (distanceA == distanceB ? 0 : 1);
+                    int order = Double.compare(distanceA, distanceB);
                     return orderMultiplier * order;
                 });
                 break;
@@ -157,34 +154,34 @@ public class ParksViewModel extends ViewModel {
     }
 
 
-    public void setPreselection(ParksPreselection preselection) {
-        postModifiedFilter(fc().preselection(preselection));
+    public void setPreselection(ParksPreselection preselection, ProviderBundle providerBundle) {
+        postModifiedFilter(fc().preselection(preselection), providerBundle);
     }
 
-    public void setParkNameFilter(String parkName) {
-        postModifiedFilter(fc().nameFilter(parkName));
+    public void setParkNameFilter(String parkName, ProviderBundle providerBundle) {
+        postModifiedFilter(fc().nameFilter(parkName), providerBundle);
     }
 
-    public void setLocationContinent(String continent) {
-        postModifiedFilter(fc().locationContinent(continent));
+    public void setLocationContinent(String continent, ProviderBundle providerBundle) {
+        postModifiedFilter(fc().locationContinent(continent), providerBundle);
     }
 
-    public void setLocationCountry(String cc2letter) {
-        postModifiedFilter(fc().locationCountryCode2letter(cc2letter));
+    public void setLocationCountry(String cc2letter, ProviderBundle providerBundle) {
+        postModifiedFilter(fc().locationCountryCode2letter(cc2letter), providerBundle);
     }
 
-    public void setLocationCityId(Integer cityId) {
-        postModifiedFilter(fc().locationCityId(cityId));
+    public void setLocationCityId(Integer cityId, ProviderBundle providerBundle) {
+        postModifiedFilter(fc().locationCityId(cityId), providerBundle);
     }
 
-    public void setNewOrder(OrderBy orderBy) {
+    public void setNewOrder(OrderBy orderBy, ProviderBundle providerBundle) {
         ParksFilterCriteria.Builder fc = fc();
         if (fc.orderBy == orderBy) {
             // If the order by criteria is the same as before, we toggle the order direction.
-            postModifiedFilter(fc.orderDirection(fc.orderDirection.reverse()));
+            postModifiedFilter(fc.orderDirection(fc.orderDirection.reverse()), providerBundle);
         } else {
             // user wants a new order.select the new order with its default order direction
-            postModifiedFilter(fc().orderBy(orderBy).orderDirection(orderBy.orderDirection()));
+            postModifiedFilter(fc().orderBy(orderBy).orderDirection(orderBy.orderDirection()), providerBundle);
         }
     }
 
@@ -197,7 +194,7 @@ public class ParksViewModel extends ViewModel {
         return ParksFilterCriteria.Builder.builder(fc);
     }
 
-    private void postModifiedFilter(ParksFilterCriteria.Builder fcBuilder) {
+    private void postModifiedFilter(ParksFilterCriteria.Builder fcBuilder, ProviderBundle providerBundle) {
         ParksFilterCriteria fcNew = fcBuilder.build();
         ParksFilterCriteria fcOld = liveParksData.getValue().filterCriteria;
         if (!fcNew.equals(fcOld)) {
@@ -211,7 +208,7 @@ public class ParksViewModel extends ViewModel {
             //  -> liveParksData.postValue(parksData)
             //  -> ParksFragment (see TextWatcher)
             //  ...
-            ParksData parksData = applyFilter(fcNew, parksProvider);
+            ParksData parksData = applyFilter(fcNew, providerBundle);
             liveParksData.postValue(parksData);
         }
     }
