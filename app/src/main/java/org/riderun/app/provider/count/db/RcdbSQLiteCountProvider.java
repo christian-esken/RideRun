@@ -6,18 +6,21 @@ import org.riderun.app.provider.count.CountProvider;
 
 import java.util.Map;
 
-public class RcdbCountProvider implements CountProvider {
-    private static RcdbCountProvider instance;
+/**
+ * A provider storing counts in a SQLite, using RCDB id's as key.
+ */
+public class RcdbSQLiteCountProvider implements CountProvider {
+    private static RcdbSQLiteCountProvider instance;
 
     private final SQLiteStorage sqLiteStorage;
 
-    private RcdbCountProvider() {
+    private RcdbSQLiteCountProvider() {
         this.sqLiteStorage = SQLiteStorage.build();
     }
 
-    public static synchronized RcdbCountProvider instance() {
+    public static synchronized RcdbSQLiteCountProvider instance() {
         if (instance == null) {
-            instance = new RcdbCountProvider();
+            instance = new RcdbSQLiteCountProvider();
         }
         return instance;
     }

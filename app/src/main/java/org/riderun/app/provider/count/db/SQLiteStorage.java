@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.riderun.app.RideRunApplication;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.CountEntry;
+import org.riderun.app.model.SiteUserData;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class SQLiteStorage extends SQLiteOpenHelper {
     private static final String TAG = "SQLiteStorage";
 
     private static volatile SQLiteStorage instance;
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static final String DB_NAME = "riderun";
 
     // Standard column names
@@ -31,6 +32,8 @@ public class SQLiteStorage extends SQLiteOpenHelper {
     //public static final String C_UUID = "uuid";  // UUID in String format "6fc6cb12-9031-4499-9578-d39d218d6ceb"
     public static final String C_PROVIDER = "provider"; // Provider ID String ("countdb", "rcdb")
     public static final String C_COMMENT = "comment";   // Free form user comment
+    public static final String C_LAST_MODIFIED = "last_modified";   // Instant
+    public static final String C_LIKED = "liked";   // boolean
 
 
     // counts
@@ -42,6 +45,13 @@ public class SQLiteStorage extends SQLiteOpenHelper {
     // metadata
     private static final String T_METADATA = "metadata";
 
+    // Sites User data
+    private static final String T_SITES_UD = "sites_ud";
+    // C_PROVIDER
+    // C_POI
+    // C_LAST_MODIFIED
+    // C_LIKED
+
     // SQL templates
     public static final String SELECT_COUNTS_SQL = "SELECT "
             + C_PROVIDER
@@ -50,6 +60,15 @@ public class SQLiteStorage extends SQLiteOpenHelper {
             + "," + C_VISITED_TIMEZONE
             + "," + C_COMMENT
             + " FROM " + T_COUNTS;
+
+    private static final String SELECT_SITES_UD = "SELECT "
+            + C_PROVIDER
+            + "," + C_POI
+            + "," + C_LAST_MODIFIED
+            + "," + C_LIKED
+            + "," + C_COMMENT
+            + " FROM " + T_SITES_UD;
+
 
 
     private SQLiteStorage(@Nullable Context context) {
@@ -112,8 +131,35 @@ public class SQLiteStorage extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, final int oldVersion, final int newVersion) {
+        int upgradeVersion = oldVersion;
+        if (upgradeVersion == 1) {
+            // upgrade to version 2
+            String createSitesUserdata = "CREATE TABLE " +  T_SITES_UD + " ("
+                    // The ID is supposed to not get exported or visible on a Web page. It is user
+                    // specific. And it is  a purely technical measure to have a unique key, that
+                    // can be updated. It may also change, e.g. on an "undo" operation the id will
+                    // change.
+                    + C_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    // The provider DB containing the POI ("rcdb", "unesco-whs"...)
+                    + C_PROVIDER + " TEXT, "
+                    // The id of the POI, as used by the provider. The ID may be numerical, an UUID, or any free from text
+                    + C_POI + " TEXT, "
+                    // Last modification (Instant)
+                    + C_LAST_MODIFIED + " INTEGER, "
+                    // Liked flag. For yes/no the value is 0/1.
+                    + C_LIKED + " INTEGER, "
+                    // A free comment, e.g. "A must see historic site". "Most beautiful theme park in Europe"
+                    + C_COMMENT + " TEXT "
+                    + ")";
 
+            db.execSQL(createSitesUserdata);
+            String indexSites = "CREATE INDEX idx_sites_ud ON " + T_SITES_UD + " (" + C_PROVIDER + "," + C_POI + ")";
+            db.execSQL(indexSites);
+
+
+            upgradeVersion = 2; // we are now at version 2
+        }
     }
 
     // --- READ FROM DB --------------------------------
@@ -138,15 +184,53 @@ public class SQLiteStorage extends SQLiteOpenHelper {
             while (!cursor.isAfterLast()) {
                 String provider = cursor.getString(0);
                 String poi = cursor.getString(1);
-                int visitedAtEpcoh = cursor.getInt(2);
+                int visitedAtEpoch = cursor.getInt(2);
                 String visitedTz = cursor.getString(3);
                 String comment = cursor.getString(4);
                 PoiKey pk = new PoiKey(provider, poi);
-                countMap.computeIfAbsent(pk, foo -> new Count()).addCount(Instant.ofEpochSecond(visitedAtEpcoh), visitedTz, comment);
+                countMap.computeIfAbsent(pk, foo -> new Count()).addCount(Instant.ofEpochSecond(visitedAtEpoch), visitedTz, comment);
                 cursor.moveToNext();
             }
             cursor.close();
             return countMap;
+        }
+    }
+
+
+    public Map<PoiKey, SiteUserData> getSitesUserdata() {
+        return getSitesUserdatFromDbQuery(SELECT_SITES_UD);
+    }
+
+    public Map<PoiKey, SiteUserData> getSitesUserdataByPoiKey(PoiKey poiKey) {
+        String sql = SELECT_COUNTS_SQL
+                + " WHERE " + C_PROVIDER + " = '" + poiKey.provider + "' AND "
+                + C_POI + " = '" + poiKey.poi + "'";
+        return getSitesUserdatFromDbQuery(SELECT_SITES_UD);
+    }
+
+    @NotNull
+    private Map<PoiKey, SiteUserData> getSitesUserdatFromDbQuery(String sql) {
+        try (SQLiteDatabase db = getReadableDatabase(); Cursor cursor = db.rawQuery(sql, null)) {
+            Map<PoiKey, SiteUserData> resultMap = new HashMap<>();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String provider = cursor.getString(0);
+                String poi = cursor.getString(1);
+                int lastModified = cursor.getInt(2);
+                int liked = cursor.getInt(3);
+                String comment = cursor.getString(4);
+                PoiKey pk = new PoiKey(provider, poi);
+                resultMap.computeIfAbsent(pk, foo ->
+                        new SiteUserData(
+                                provider,
+                                poi,
+                                liked == 1,
+                                comment,
+                                Instant.ofEpochSecond(lastModified)));
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return resultMap;
         }
     }
 
@@ -176,6 +260,30 @@ public class SQLiteStorage extends SQLiteOpenHelper {
                 cv.put(C_COMMENT, ce.comment());
                 db.insert(T_COUNTS, null, cv);
             }
+        }
+    }
+
+    /**
+     * Writes  the siteUserData fot the given POI. If siteUserData for the POI existed, they will be replaced.
+     * @param poiKey The POI
+     * @param siteUserData The (new) siteUserData
+     */
+    public void replaceSiteUserdata(PoiKey poiKey, SiteUserData siteUserData) {
+        try(SQLiteDatabase db = getWritableDatabase()) {
+            String sqlWhere = C_PROVIDER + " = ? AND " + C_POI + " = ? ";
+            ContentValues cv = new ContentValues();
+            cv.put(C_PROVIDER, poiKey.provider);
+            cv.put(C_POI, poiKey.poi);
+            cv.put(C_LAST_MODIFIED, siteUserData.getLastModified().getEpochSecond());
+            cv.put(C_LIKED, siteUserData.getLiked());
+            cv.put(C_COMMENT, siteUserData.getComment());
+
+            String[] whereArgs = new String[2];
+            whereArgs[0] = poiKey.provider;
+            whereArgs[1] = poiKey.poi;
+
+            db.update(T_SITES_UD, cv, sqlWhere, whereArgs);
+
         }
     }
 }

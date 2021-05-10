@@ -1,6 +1,6 @@
 package org.riderun.app.provider.parkuserdata.heap;
 
-import org.riderun.app.model.ParkUserData;
+import org.riderun.app.model.SiteUserData;
 import org.riderun.app.provider.ProviderType;
 import org.riderun.app.provider.parkuserdata.ParksUserDataProvider;
 
@@ -12,7 +12,7 @@ import static org.riderun.app.provider.ProviderType.UserNotes;
 public class ParksUserDataHeapProvider implements ParksUserDataProvider {
     private static ParksUserDataProvider instance;
     // Map: rcdbId -> ParkUserData
-    Map<Integer, ParkUserData> userData = new HashMap<>();
+    Map<Integer, SiteUserData> userData = new HashMap<>();
 
     public static synchronized ParksUserDataProvider instance() {
         if (instance == null) {
@@ -22,8 +22,8 @@ public class ParksUserDataHeapProvider implements ParksUserDataProvider {
     }
 
     @Override
-    public ParkUserData byRcdbId(int rcdbId) {
-        return userData.computeIfAbsent(rcdbId, (x) -> new ParkUserData(rcdbId));
+    public SiteUserData byRcdbId(int rcdbId) {
+        return userData.computeIfAbsent(rcdbId, (x) -> new SiteUserData("heap", Integer.toString(rcdbId)));
     }
 
     @Override

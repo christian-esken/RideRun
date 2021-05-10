@@ -3,7 +3,7 @@ package org.riderun.app.ui.parks;
 import org.riderun.app.model.City;
 import org.riderun.app.model.GeoCoordinate;
 import org.riderun.app.model.Park;
-import org.riderun.app.model.ParkUserData;
+import org.riderun.app.model.SiteUserData;
 import org.riderun.app.provider.ProviderBundle;
 import org.riderun.app.provider.ProviderFactory;
 import org.riderun.app.provider.city.CityProvider;
@@ -66,7 +66,7 @@ public class ParksViewModel extends ViewModel {
                 parkList = new ArrayList<>();
                 final ParksUserDataProvider parksUserDataProvider = providerBundle.siteUserDataProvider();
                 for (Park park : parkprovider.all()) {
-                    ParkUserData pud = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                    SiteUserData pud = parksUserDataProvider.byRcdbId(park.getRcdbId());
                     if(pud != null && pud.getLiked()) {
                         parkList.add(park);
                     }

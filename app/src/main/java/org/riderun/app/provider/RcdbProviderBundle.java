@@ -3,7 +3,7 @@ package org.riderun.app.provider;
 import org.riderun.app.provider.city.CityProvider;
 import org.riderun.app.provider.city.rcdb.CityRCDBProvider;
 import org.riderun.app.provider.count.CountProvider;
-import org.riderun.app.provider.count.db.RcdbCountProvider;
+import org.riderun.app.provider.count.db.RcdbSQLiteCountProvider;
 import org.riderun.app.provider.country.CountryProvider;
 import org.riderun.app.provider.park.ParksProvider;
 import org.riderun.app.provider.park.rcdb.ParksRCDBProvider;
@@ -40,7 +40,7 @@ public class RcdbProviderBundle implements ProviderBundle {
 
     @Override
     public CountProvider countProvider() {
-        return RcdbCountProvider.instance();
+        return RcdbSQLiteCountProvider.instance();
     }
 
 }

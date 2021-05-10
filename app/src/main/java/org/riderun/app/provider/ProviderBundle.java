@@ -12,7 +12,7 @@ import org.riderun.app.provider.ride.RidesProvider;
  * contains d location provider (theme parks), an Attraction provider (rollercoasters per park),
  * and a city provider (cities containing parks). Example 2: The "Unesco World Heritage Site"
  * bundle contains a  location provider (world heritage sites),  an Attraction provider (Castle visit,
- * Gulded Tour, ...) and a city provider (cities wiht world heritage sites). Example 3: The "mock"
+ * Gulded Tour, ...) and a city provider (cities with world heritage sites). Example 3: The "mock"
  * provider works on artificial data. It  can be used fur unit or integration tests, or for
  * development tests. Mock providers can use in memory storage, making sure that the real
  * database is not modified/corrupted during tests.
