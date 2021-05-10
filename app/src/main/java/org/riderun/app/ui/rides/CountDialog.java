@@ -18,13 +18,15 @@ public class CountDialog extends AppCompatDialogFragment {
     private final Count count;
     private final CountProvider countProvider;
     private final RidesViewModel ridesViewModel;
+    private final boolean addRepeatMode;
 
-    public CountDialog(Ride ride, Count count, CountProvider countProvider, RidesViewModel ridesViewModel) {
+    public CountDialog(Ride ride, Count count, CountProvider countProvider, RidesViewModel ridesViewModel, boolean addRepeatMode) {
         super();
         this.ride = ride;
         this.count = count;
         this.countProvider = countProvider;
         this.ridesViewModel = ridesViewModel;
+        this.addRepeatMode = addRepeatMode;
     }
 
     @NonNull
@@ -34,23 +36,33 @@ public class CountDialog extends AppCompatDialogFragment {
         String msg = ride.name() + " (" + ride.rcdbId() + ") ";
         //final  Count count = ride.getCount();
         final boolean actionIsRemove = count != null && !count.isEmpty();
-        if (actionIsRemove) {
+        if (addRepeatMode && count != null) {
             CountEntry lastEntry = count.getLastEntry();
-            msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
-         } else {
-            msg += " is not counted yet. Confirm with OK to mark the count.";
+            msg += " is already counted. Confirm with OK to add another count. " + lastEntry.formatAsDateTime();
+        } else {
+            if (actionIsRemove) {
+                CountEntry lastEntry = count.getLastEntry();
+                msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
+            } else {
+                msg += " is not counted yet. Confirm with OK to mark the count.";
+            }
         }
 
         builder.setTitle("Count Ride").setMessage(msg);
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
-            if (actionIsRemove) {
-                count.removeCount(count.getLastEntry());
+            if (addRepeatMode) {
+                count.addCountNow(null);
                 ridesViewModel.notifyCountChange(ride, count, countProvider);
             } else {
-                // TODO Add comment field in GUI, for optional comments
-                Count countToUpdate = count == null ? new Count() : count;
-                countToUpdate.addCountNow(null);
-                ridesViewModel.notifyCountChange(ride, countToUpdate, countProvider);
+                if (actionIsRemove) {
+                    count.removeCount(count.getLastEntry());
+                    ridesViewModel.notifyCountChange(ride, count, countProvider);
+                } else {
+                    // TODO Add comment field in GUI, for optional comments
+                    Count countToUpdate = count == null ? new Count() : count;
+                    countToUpdate.addCountNow(null);
+                    ridesViewModel.notifyCountChange(ride, countToUpdate, countProvider);
+                }
             }
         });
         builder.setNegativeButton("Cancel", (a,b) -> {} );

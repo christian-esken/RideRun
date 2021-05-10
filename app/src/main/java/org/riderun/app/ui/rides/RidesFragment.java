@@ -16,7 +16,7 @@ import org.riderun.app.R;
 import org.riderun.app.model.Count;
 import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Park;
-import org.riderun.app.model.ParkUserData;
+import org.riderun.app.model.SiteUserData;
 import org.riderun.app.model.Ride;
 import org.riderun.app.provider.ProviderBundle;
 import org.riderun.app.provider.ProviderFactory;
@@ -60,15 +60,15 @@ public class RidesFragment extends Fragment {
                 ParksUserDataProvider parksUserDataProvider = providerBundle.siteUserDataProvider();
                 textView.setText(park.getName() + " / " + cityProvider.byCityId(park.getCityId(), true));
 
-                ParkUserData parkUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
-                likeButton.setActivated(parkUserData.getLiked());
+                SiteUserData siteUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                likeButton.setActivated(siteUserData.getLiked());
 
                 likeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         boolean activate = !likeButton.isActivated();
-                        ParkUserData parkUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
-                        parkUserData.setLiked(activate);
+                        SiteUserData siteUserData = parksUserDataProvider.byRcdbId(park.getRcdbId());
+                        siteUserData.setLiked(activate);
                         likeButton.setActivated(activate);
                     }
                 });
@@ -104,6 +104,7 @@ public class RidesFragment extends Fragment {
                     Count count = rd.countByKey(ride.rcdbId());
                     CountEntry ceFirst = count == null ? null : count.getFirstEntry();
                     final Button countButton;
+                    Button repeatButton = null;
                     if (ceFirst == null) {
                         Button button = new Button(ctx);
                         button.setText("Count");
@@ -116,14 +117,24 @@ public class RidesFragment extends Fragment {
                         button.setText(ceFirst.formatAsDateTime());
                         //button.setBackgroundColor(Color.LTGRAY);
                         countButton = button;
+
+                        repeatButton = new Button(ctx);
+                        repeatButton.setText("+1");
+                        repeatButton.setTextColor(Color.BLUE);
                     }
 
-                    countButton.setOnClickListener(view -> openDialog(view, count, countProvider, ride));
+                    countButton.setOnClickListener(view -> openDialog(view, count, countProvider, ride, false));
+                    if (repeatButton != null) {
+                        repeatButton.setOnClickListener(view -> openDialog(view, count, countProvider, ride, true));
+                    }
 
                     TextView tv1 = new TextView(ctx);
                     tv1.setText(ride.name());
                     tr.addView(tv1);
                     tr.addView(countButton);
+                    if (repeatButton != null) {
+                        tr.addView(repeatButton);
+                    }
                     rideTable.addView(tr);
                 }
 
@@ -132,8 +143,8 @@ public class RidesFragment extends Fragment {
         return root;
     }
 
-    private void openDialog(View view, Count count, CountProvider countProvider, Ride ride) {
-        CountDialog dialog = new CountDialog(ride, count, countProvider, ridesViewModel);
+    private void openDialog(View view, Count count, CountProvider countProvider, Ride ride, boolean addRepeatMode) {
+        CountDialog dialog = new CountDialog(ride, count, countProvider, ridesViewModel, addRepeatMode);
         dialog.show(this.getParentFragmentManager(), "info");
     }
 }
