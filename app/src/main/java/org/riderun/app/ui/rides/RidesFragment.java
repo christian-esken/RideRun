@@ -86,15 +86,8 @@ public class RidesFragment extends Fragment {
 
                 Context ctx = rideTable.getContext();
                 rideTable.removeAllViews();
-                TableRow th = new TableRow(ctx);
-                th.setBackgroundColor(Color.LTGRAY);
-                TextView thRide = new TextView(ctx);
-                thRide.setText("Ride");
-                TextView thCount = new TextView(ctx);
-                thCount.setText("Count");
-                th.addView(thRide);
-                th.addView(thCount);
-                rideTable.addView(th);
+
+                addHeaderRow(ctx, rideTable);
 
                 CountProvider countProvider = providerBundle.countProvider();
                 for (Ride ride : rides) {
@@ -138,9 +131,24 @@ public class RidesFragment extends Fragment {
                     rideTable.addView(tr);
                 }
 
+                addHeaderRow(ctx, rideTable);
+
+
             }
         });
         return root;
+    }
+
+    private void addHeaderRow(Context ctx, TableLayout rideTable) {
+        TableRow th = new TableRow(ctx);
+        th.setBackgroundColor(Color.LTGRAY);
+        TextView thRide = new TextView(ctx);
+        thRide.setText("Ride");
+        TextView thCount = new TextView(ctx);
+        thCount.setText("Count");
+        th.addView(thRide);
+        th.addView(thCount);
+        rideTable.addView(th);
     }
 
     private void openDialog(View view, Count count, CountProvider countProvider, Ride ride, boolean addRepeatMode) {

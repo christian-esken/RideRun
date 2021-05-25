@@ -173,13 +173,7 @@ public class ParksFragment extends Fragment {
                     tv.setText("No matching park .. clear filters"); // TODO translation
                     parksTable.addView(tv);
                 } else {
-                    TableRow th = new TableRow(pctx);
-                    th.setBackgroundColor(Color.LTGRAY);
-                    addTextcolToRow(pctx, th, "Park", OrderBy.Name, parksViewModel, providerBundle);
-                    addTextcolToRow(pctx, th, "Count", OrderBy.AttractionCount, parksViewModel, providerBundle);
-                    addTextcolToRow(pctx, th, "Location", OrderBy.Distance, parksViewModel, providerBundle);
-                    parksTable.addView(th);
-
+                    addHeaderRow(pctx, parksViewModel, providerBundle, parksTable);
 
 
                     for (Park park : parksList) {
@@ -242,11 +236,22 @@ public class ParksFragment extends Fragment {
 
                         parksTable.addView(tr);
                     }
+
+                    addHeaderRow(pctx, parksViewModel, providerBundle, parksTable);
                 }
             }
         });
 
         return root;
+    }
+
+    private void addHeaderRow(Context pctx, ParksViewModel parksViewModel, ProviderBundle providerBundle, TableLayout parksTable) {
+        TableRow th = new TableRow(pctx);
+        th.setBackgroundColor(Color.LTGRAY);
+        addTextcolToRow(pctx, th, "Park", OrderBy.Name, parksViewModel, providerBundle);
+        addTextcolToRow(pctx, th, "Count", OrderBy.AttractionCount, parksViewModel, providerBundle);
+        addTextcolToRow(pctx, th, "Location", OrderBy.Distance, parksViewModel, providerBundle);
+        parksTable.addView(th);
     }
 
     private void preselectByLikes(ParksFilterCriteria filterCriteria) {
