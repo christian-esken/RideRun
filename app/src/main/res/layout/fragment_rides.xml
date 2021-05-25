@@ -1,109 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="1dp"
-    android:layout_marginHorizontal="1dp"
-    android:layout_marginVertical="1dp"
-    android:layout_marginStart="4dp"
-    android:layout_marginLeft="4dp"
-    android:layout_marginTop="1dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginRight="4dp"
-    android:layout_marginBottom="1dp"
-    android:orientation="vertical"
-    tools:context="org.riderun.app.ui.rides.RidesFragment">
+    android:layout_marginBottom="?attr/actionBarSize"
+    tools:context=".ui.rides.RidesFragment">
 
     <LinearLayout
-        android:id="@+id/overviewHeader"
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/park_like_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:src="@android:drawable/btn_star" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0" />
-
-        <TextView
-            android:id="@+id/textView_location"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_margin="0dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
-            android:layout_weight="1"
-            android:autoSizeMaxTextSize="32dp"
-            android:autoSizeTextType="uniform"
-            android:textAlignment="center" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0" />
-
-        <TextView
-            android:id="@+id/textViewCounts"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
-            android:layout_weight="0"
-            android:textSize="24sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/quickfilters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ToggleButton
-            android:id="@+id/qfOpenCounts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="ToggleButton"
-            android:textOff="ALL"
-            android:textOn="OPEN" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="RCDB" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Queue Times" />
-
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_margin="1dp"
+        android:layout_marginHorizontal="1dp"
+        android:layout_marginVertical="1dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context="org.riderun.app.ui.rides.RidesFragment"
+        tools:layout_editor_absoluteX="1dp">
 
         <LinearLayout
+            android:id="@+id/overviewHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/park_like_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:src="@android:drawable/btn_star" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0" />
+
+            <TextView
+                android:id="@+id/textView_location"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_margin="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:autoSizeMaxTextSize="32dp"
+                android:autoSizeTextType="uniform"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/textViewCounts"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="0"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/quickfilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="RCDB" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Queue Times" />
+
+            <ToggleButton
+                android:id="@+id/qfOpenCounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ToggleButton"
+                android:textOff="ALL"
+                android:textOn="OPEN" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TableLayout
                 android:id="@+id/rideTable"
@@ -118,7 +116,8 @@
                 android:paddingEnd="2dp"
                 android:paddingRight="2dp"
                 android:paddingBottom="2dp" />
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
 
-</LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
