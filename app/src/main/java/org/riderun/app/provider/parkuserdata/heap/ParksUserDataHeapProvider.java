@@ -22,8 +22,14 @@ public class ParksUserDataHeapProvider implements ParksUserDataProvider {
     }
 
     @Override
-    public SiteUserData byRcdbId(int rcdbId) {
-        return userData.computeIfAbsent(rcdbId, (x) -> new SiteUserData("heap", Integer.toString(rcdbId)));
+    public SiteUserData byRcdbId(final int rcdbId) {
+        return userData.computeIfAbsent(rcdbId, (x) -> {
+            if ((rcdbId == 4874) || (rcdbId == 4872) || (rcdbId == 4886) || (rcdbId == 4796) || rcdbId == 4855 || rcdbId == 18544 || rcdbId == 5205 || rcdbId == 5216) {
+                // For a demo,. lets make some parks "favorite"
+                return new SiteUserData("heap", Integer.toString(rcdbId), true, null, null);
+            }
+            return new SiteUserData("heap", Integer.toString(rcdbId));
+        });
     }
 
     @Override
