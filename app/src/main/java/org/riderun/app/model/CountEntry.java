@@ -21,6 +21,10 @@ public class CountEntry implements Comparable<CountEntry> {
         this.comment = comment;
     }
 
+    public Instant instant() {
+        return instant;
+    }
+
     public String formatAsDate() {
         DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneId.of(timezone));

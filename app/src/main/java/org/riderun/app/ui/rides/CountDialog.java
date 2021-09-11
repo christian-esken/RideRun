@@ -9,6 +9,9 @@ import org.riderun.app.model.CountEntry;
 import org.riderun.app.model.Ride;
 import org.riderun.app.provider.count.CountProvider;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
@@ -35,18 +38,26 @@ public class CountDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         String msg = ride.name() + " (" + ride.rcdbId() + ") ";
         //final  Count count = ride.getCount();
-        final boolean actionIsRemove = count != null && !count.isEmpty();
+        boolean actionIsRemove = count != null && !count.isEmpty();
         if (addRepeatMode && count != null) {
             CountEntry lastEntry = count.getLastEntry();
             msg += " is already counted. Confirm with OK to add another count. " + lastEntry.formatAsDateTime();
         } else {
             if (actionIsRemove) {
                 CountEntry lastEntry = count.getLastEntry();
-                msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
+                Instant instant = lastEntry.instant();
+                if (lastEntry.instant() != null && instant.isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
+                    actionIsRemove = false;
+                    msg += " was counted more than 1 day ago. Deletion prohibited. Confirm with OK to add add the count instead.";
+                } else {
+                    msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
+                }
             } else {
                 msg += " is not counted yet. Confirm with OK to mark the count.";
             }
         }
+
+        final boolean actionIsRemoveL = actionIsRemove;
 
         builder.setTitle("Count Ride").setMessage(msg);
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
@@ -54,7 +65,7 @@ public class CountDialog extends AppCompatDialogFragment {
                 count.addCountNow(null);
                 ridesViewModel.notifyCountChange(ride, count, countProvider);
             } else {
-                if (actionIsRemove) {
+                if (actionIsRemoveL) {
                     count.removeCount(count.getLastEntry());
                     ridesViewModel.notifyCountChange(ride, count, countProvider);
                 } else {
