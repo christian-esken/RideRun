@@ -112,7 +112,7 @@ public class RidesFragment extends Fragment {
                         countButton = button;
 
                         repeatButton = new Button(ctx);
-                        repeatButton.setText("+1");
+                        repeatButton.setText("[" + count.size() + " ]");
                         repeatButton.setTextColor(Color.BLUE);
                     }
 
@@ -146,13 +146,16 @@ public class RidesFragment extends Fragment {
         thRide.setText("Ride");
         TextView thCount = new TextView(ctx);
         thCount.setText("Count");
+        TextView thEdit = new TextView(ctx);
+        thEdit.setText("Count");
         th.addView(thRide);
         th.addView(thCount);
+        th.addView(thEdit);
         rideTable.addView(th);
     }
 
-    private void openDialog(View view, Count count, CountProvider countProvider, Ride ride, boolean addRepeatMode) {
-        CountDialog dialog = new CountDialog(ride, count, countProvider, ridesViewModel, addRepeatMode);
+    private void openDialog(View view, Count count, CountProvider countProvider, Ride ride, boolean editMode) {
+        CountDialog dialog = new CountDialog(ride, count, countProvider, ridesViewModel, editMode);
         dialog.show(this.getParentFragmentManager(), "info");
     }
 }

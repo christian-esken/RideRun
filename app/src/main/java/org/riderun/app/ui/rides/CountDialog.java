@@ -21,15 +21,15 @@ public class CountDialog extends AppCompatDialogFragment {
     private final Count count;
     private final CountProvider countProvider;
     private final RidesViewModel ridesViewModel;
-    private final boolean addRepeatMode;
+    private final boolean editMode;
 
-    public CountDialog(Ride ride, Count count, CountProvider countProvider, RidesViewModel ridesViewModel, boolean addRepeatMode) {
+    public CountDialog(Ride ride, Count count, CountProvider countProvider, RidesViewModel ridesViewModel, boolean editMode) {
         super();
         this.ride = ride;
         this.count = count;
         this.countProvider = countProvider;
         this.ridesViewModel = ridesViewModel;
-        this.addRepeatMode = addRepeatMode;
+        this.editMode = editMode;
     }
 
     @NonNull
@@ -38,20 +38,21 @@ public class CountDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         String msg = ride.name() + " (" + ride.rcdbId() + ") ";
         //final  Count count = ride.getCount();
-        boolean actionIsRemove = count != null && !count.isEmpty();
-        if (addRepeatMode && count != null) {
+        boolean actionIsRemove = editMode && count != null && !count.isEmpty();
+        if (editMode) {
+            // Guarantered here: count != null
             CountEntry lastEntry = count.getLastEntry();
-            msg += " is already counted. Confirm with OK to add another count. " + lastEntry.formatAsDateTime();
+            Instant instant = lastEntry.instant();
+            if (lastEntry.instant() != null && instant.isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
+                actionIsRemove = false;
+                msg += " was counted more than 1 day ago. Deletion prohibited. Confirm with OK to add add the count instead.";
+            } else {
+                msg += " is already counted " + count.size() +" times. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
+            }
         } else {
-            if (actionIsRemove) {
-                CountEntry lastEntry = count.getLastEntry();
-                Instant instant = lastEntry.instant();
-                if (lastEntry.instant() != null && instant.isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
-                    actionIsRemove = false;
-                    msg += " was counted more than 1 day ago. Deletion prohibited. Confirm with OK to add add the count instead.";
-                } else {
-                    msg += " is already counted. Confirm with OK to remove the latest count. " + lastEntry.formatAsDateTime();
-                }
+            CountEntry lastEntry = count == null ? null : count.getLastEntry();
+            if (lastEntry != null) {
+                msg += " is already counted. Confirm with OK to add another count. " + lastEntry.formatAsDateTime();
             } else {
                 msg += " is not counted yet. Confirm with OK to mark the count.";
             }
@@ -61,19 +62,14 @@ public class CountDialog extends AppCompatDialogFragment {
 
         builder.setTitle("Count Ride").setMessage(msg);
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
-            if (addRepeatMode) {
-                count.addCountNow(null);
+            if (actionIsRemoveL) {
+                count.removeCount(count.getLastEntry());
                 ridesViewModel.notifyCountChange(ride, count, countProvider);
             } else {
-                if (actionIsRemoveL) {
-                    count.removeCount(count.getLastEntry());
-                    ridesViewModel.notifyCountChange(ride, count, countProvider);
-                } else {
-                    // TODO Add comment field in GUI, for optional comments
-                    Count countToUpdate = count == null ? new Count() : count;
-                    countToUpdate.addCountNow(null);
-                    ridesViewModel.notifyCountChange(ride, countToUpdate, countProvider);
-                }
+                // TODO Add comment field in GUI, for optional comments
+                Count countToUpdate = count == null ? new Count() : count;
+                countToUpdate.addCountNow(null);
+                ridesViewModel.notifyCountChange(ride, countToUpdate, countProvider);
             }
         });
         builder.setNegativeButton("Cancel", (a,b) -> {} );

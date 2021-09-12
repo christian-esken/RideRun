@@ -66,4 +66,7 @@ public class Count {
         counts.remove(countEntry);
     }
 
+    public int size() {
+        return counts.size();
+    }
 }
